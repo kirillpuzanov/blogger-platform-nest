@@ -2,8 +2,9 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UsersModule } from './modules/users/users.module';
-import { settings } from './setup/settings';
+import { UsersModule } from '../modules/users/users.module';
+import { settings } from '../setup/settings';
+import { TestingModule } from '../modules/testing/testing.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { settings } from './setup/settings';
       dbName: settings.DB_NAME,
     }),
     UsersModule,
+    TestingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
