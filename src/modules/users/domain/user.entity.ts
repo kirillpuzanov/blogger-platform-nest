@@ -47,7 +47,7 @@ export class User {
   @Prop({ type: RecoveryPassData, required: false })
   recoveryPassData?: RecoveryPassData;
 
-  @Prop({ type: String })
+  @Prop({ type: Date })
   createdAt: Date;
 
   static modelName = 'UserModel';

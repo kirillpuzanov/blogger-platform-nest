@@ -24,7 +24,7 @@ export class UsersController {
   ) {}
 
   @Get()
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.OK)
   async getUsers(
     @Query() query: GetUsersQueryInputDto,
   ): Promise<PaginatedViewDto<UserViewDto[]>> {
