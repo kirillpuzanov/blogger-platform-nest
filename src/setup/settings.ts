@@ -1,6 +1,6 @@
 export const settings = {
   PORT: process.env.PORT ?? 3001,
-  MONGO_URL: process.env.MONGO_URL ?? '',
+  MONGO_URL: process.env.MONGO_URL ?? '_',
   DB_NAME: process.env.DB_NAME ?? 'blockPostDb',
   JWT_SECRET: process.env.JWT_SECRET ?? 'jwt_secret',
   EMAIL: process.env.EMAIL ?? '',
