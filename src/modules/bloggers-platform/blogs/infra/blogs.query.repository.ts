@@ -16,7 +16,6 @@ export class BlogsQueryRepository {
     const { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm } =
       query;
 
-    const skip = (pageNumber - 1) * pageSize;
     const filter: Record<string, object> = {};
 
     if (searchNameTerm) {
@@ -25,7 +24,7 @@ export class BlogsQueryRepository {
 
     const blogs = await this.BlogModel.find(filter)
       .sort({ [sortBy]: sortDirection })
-      .skip(skip)
+      .skip(query.calculateSkip())
       .limit(pageSize)
       .lean();
 

@@ -23,8 +23,6 @@ export class UsersQueryRepository {
       searchEmailTerm,
     } = query;
 
-    const skip = (pageNumber - 1) * pageSize;
-
     let filter = {};
     const searchedFields: Array<object> = [];
 
@@ -44,7 +42,7 @@ export class UsersQueryRepository {
     }
     const users = await this.UserModel.find(filter)
       .sort({ [sortBy]: sortDirection })
-      .skip(skip)
+      .skip(query.calculateSkip())
       .limit(pageSize)
       .lean();
 

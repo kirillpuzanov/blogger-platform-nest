@@ -3,3 +3,9 @@ export class CreateBlogDto {
   description: string;
   websiteUrl: string;
 }
+
+export class CreatePostByBlogDto {
+  title: string;
+  shortDescription: string;
+  content: string;
+}

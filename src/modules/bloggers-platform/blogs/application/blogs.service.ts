@@ -8,7 +8,7 @@ import { BlogsRepository } from '../infra/blogs.repository';
 export class BlogsService {
   constructor(
     @InjectModel(Blog.modelName) private BlogModel: BlogModelType,
-    public blogsRepository: BlogsRepository,
+    private blogsRepository: BlogsRepository,
     // @Inject(PostsService) public postsService: PostsService,
     // @Inject(CommentService) public commentService: CommentService,
   ) {}

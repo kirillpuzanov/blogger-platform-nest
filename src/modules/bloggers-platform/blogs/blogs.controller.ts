@@ -15,15 +15,21 @@ import { BlogsQueryRepository } from './infra/blogs.query.repository';
 import { GetBlogsQueryInputDto } from './api/input-dto/get-blogs-query.input-dto';
 import { PaginatedViewDto } from '../../../core/dto/base-paginated.view-dto';
 import { BlogViewDto } from './api/view-dto/blog.view-dto';
-import { CreateBlogInputDto } from './api/input-dto/CreateBlogInputDto';
+import {
+  CreateBlogInputDto,
+  CreatePostByBlogInputDto,
+} from './api/input-dto/create-blog.input-dto';
+import { PostsQueryRepository } from '../posts/infra/posts.query.repository';
+import { PostsService } from '../posts/application/posts.service';
+import { GetPostsQueryInputDto } from '../posts/api/input-dto/get-posts-query.input-dto';
 
 @Controller('blogs')
 export class BlogsController {
   constructor(
     private blogsQueryRepository: BlogsQueryRepository,
     private blogsService: BlogsService,
-    // private postsQueryRepository: PostsQueryRepository,
-    // private postsService: PostsService,
+    private postsQueryRepository: PostsQueryRepository,
+    private postsService: PostsService,
   ) {}
 
   @Get()
@@ -59,31 +65,36 @@ export class BlogsController {
     return this.blogsService.deleteBlog(id);
   }
 
-  // todo
-  // @Get(':id/posts')
-  // @HttpCode(HttpStatus.OK)
-  // async getPostsByBlog(
-  //   @Query() query: GetBlogsQueryInputDto,
-  //   @Param('id') id: string,
-  // ) {
-  //   return this.postsQueryRepository.getPostsByBlog(id, query, userId);
-  // }
+  @Get(':id/posts')
+  @HttpCode(HttpStatus.OK)
+  async getPostsByBlog(
+    @Query() query: GetPostsQueryInputDto,
+    @Param('id') id: string,
+  ) {
+    return this.postsQueryRepository.getPostsByBlog(
+      id,
+      query,
+      // userId todo
+    );
+  }
 
-  // @Post('/:blogId/posts')
-  // @HttpCode(HttpStatus.CREATED)
-  // async createPostByBlog(
-  //   @Param('id') id: string,
-  //   @Body() body: CreatePostByBlogInput,
-  // ) {
-  //   const createdPostId = await this.postsService.createPost({
-  //     content,
-  //     shortDescription,
-  //     title,
-  //     blogId,
-  //   });
-  //   const postView = await this.postsQueryRepository.getById(
-  //     createdPostId,
-  //     userId,
-  //   );
-  // }
+  @Post('/:blogId/posts')
+  @HttpCode(HttpStatus.CREATED)
+  async createPostByBlog(
+    @Param('blogId') blogId: string,
+    @Body() body: CreatePostByBlogInputDto,
+  ) {
+    const { content, shortDescription, title } = body;
+    const createdPostId = await this.postsService.createPost({
+      content,
+      shortDescription,
+      title,
+      blogId,
+    });
+
+    return this.postsQueryRepository.getById(
+      createdPostId,
+      // userId, todo
+    );
+  }
 }
