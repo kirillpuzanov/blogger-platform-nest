@@ -14,3 +14,5 @@ export function swaggerSetup(app: INestApplication) {
     customSiteTitle: 'Blogger Swagger',
   });
 }
+
+// todo - в свагере не генирится пример респонса ??

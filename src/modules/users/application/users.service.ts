@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, type UserModelType } from '../domain/user.entity';
 import { UsersRepository } from '../infra/users.repository';
@@ -48,8 +48,7 @@ export class UsersService {
     const deletedCount = await this.usersRepository.deleteOne(id);
 
     if (deletedCount < 1) {
-      // todo
-      // throw new NotFoundError('user is not exists', 'user');
+      throw new NotFoundException('user is not exists', 'user');
     }
     // todo
     // await this.sessionsRepository.deleteAllUserSessions(id);

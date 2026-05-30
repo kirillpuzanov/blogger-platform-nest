@@ -24,7 +24,7 @@ export class ExtendedLikesInfo {
   dislikesCount: number;
 
   @Prop({ type: [NewestLike], require: true })
-  newestLikes: [NewestLike];
+  newestLikes: NewestLike[];
 }
 
 @Schema({ timestamps: true })
@@ -56,13 +56,13 @@ export class Post {
   static createPost(dto: CreatePostDomainDto): PostDocument {
     const post = new this();
 
-    dto.title = post.title;
-    dto.shortDescription = post.shortDescription;
-    dto.content = post.content;
-    dto.blogId = post.blogId;
-    dto.blogName = post.blogName;
-    dto.createdAt = post.createdAt;
-    dto.extendedLikesInfo = post.extendedLikesInfo;
+    post.title = dto.title;
+    post.shortDescription = dto.shortDescription;
+    post.content = dto.content;
+    post.blogId = dto.blogId;
+    post.blogName = dto.blogName;
+    post.createdAt = dto.createdAt;
+    post.extendedLikesInfo = dto.extendedLikesInfo;
 
     return post as PostDocument;
   }

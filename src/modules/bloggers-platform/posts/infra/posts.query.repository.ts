@@ -47,7 +47,7 @@ export class PostsQueryRepository {
     });
   }
 
-  async getById(
+  async getByIdOrFail(
     id: string,
     // userId: string | undefined // todo
   ): Promise<PostViewDto> {
@@ -72,7 +72,7 @@ export class PostsQueryRepository {
   ): Promise<PaginatedViewDto<PostViewDto[]>> {
     const { pageNumber, pageSize, sortBy, sortDirection } = query;
 
-    const blog = await this.blogsQueryRepository.getById(blogId);
+    const blog = await this.blogsQueryRepository.getByIdOrFail(blogId);
 
     if (!blog) {
       throw new NotFoundException('blog does not exists', 'blogId');

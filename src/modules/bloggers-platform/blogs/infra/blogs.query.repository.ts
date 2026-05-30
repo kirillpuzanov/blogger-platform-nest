@@ -40,12 +40,14 @@ export class BlogsQueryRepository {
     });
   }
 
-  async getById(id: string): Promise<BlogViewDto> {
+  async getByIdOrFail(id: string): Promise<BlogViewDto> {
     const blog = await this.BlogModel.findOne({ _id: new ObjectId(id) });
 
     if (!blog) {
-      throw new NotFoundException('user not found');
+      throw new NotFoundException('blog for create post not found');
     }
-    return BlogViewDto.mapToView(blog);
+    const b = BlogViewDto.mapToView(blog);
+    console.log('bbb', b);
+    return b;
   }
 }

@@ -43,14 +43,14 @@ export class BlogsController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string): Promise<BlogViewDto> {
-    return this.blogsQueryRepository.getById(id);
+    return this.blogsQueryRepository.getByIdOrFail(id);
   }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createBlog(@Body() body: CreateBlogInputDto): Promise<BlogViewDto> {
     const blogId = await this.blogsService.createBlog(body);
-    return this.blogsQueryRepository.getById(blogId);
+    return this.blogsQueryRepository.getByIdOrFail(blogId);
   }
 
   @Put(':id')
@@ -65,14 +65,14 @@ export class BlogsController {
     return this.blogsService.deleteBlog(id);
   }
 
-  @Get(':id/posts')
+  @Get(':blogId/posts')
   @HttpCode(HttpStatus.OK)
   async getPostsByBlog(
+    @Param('blogId') blogId: string,
     @Query() query: GetPostsQueryInputDto,
-    @Param('id') id: string,
   ) {
     return this.postsQueryRepository.getPostsByBlog(
-      id,
+      blogId,
       query,
       // userId todo
     );
@@ -92,7 +92,7 @@ export class BlogsController {
       blogId,
     });
 
-    return this.postsQueryRepository.getById(
+    return this.postsQueryRepository.getByIdOrFail(
       createdPostId,
       // userId, todo
     );

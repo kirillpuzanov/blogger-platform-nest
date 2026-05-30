@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, type PostModelType } from '../domain/post.entity';
 import { BlogsQueryRepository } from '../../blogs/infra/blogs.query.repository';
@@ -18,11 +18,7 @@ export class PostsService {
 
   async createPost(input: CreatePostInputDto): Promise<string> {
     const { blogId } = input;
-    const blog = await this.blogsQueryRepository.getById(blogId);
-
-    if (!blog) {
-      throw new NotFoundException('blog not found', 'blogId');
-    }
+    const blog = await this.blogsQueryRepository.getByIdOrFail(blogId);
 
     const { content, shortDescription, title } = input;
 

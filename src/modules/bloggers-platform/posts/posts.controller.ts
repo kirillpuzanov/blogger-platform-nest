@@ -36,15 +36,15 @@ export class PostsController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async getById(@Param('postId') postId: string): Promise<PostViewDto> {
-    return this.postsQueryRepository.getById(postId);
+  async getById(@Param('id') postId: string): Promise<PostViewDto> {
+    return this.postsQueryRepository.getByIdOrFail(postId);
   }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createPost(@Body() body: CreatePostInputDto): Promise<PostViewDto> {
     const postId = await this.postsService.createPost(body);
-    return this.postsQueryRepository.getById(postId);
+    return this.postsQueryRepository.getByIdOrFail(postId);
   }
 
   @Put(':id')

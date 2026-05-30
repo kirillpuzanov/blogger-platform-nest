@@ -16,7 +16,7 @@ export class Blog {
   @Prop({ type: Date, require: true })
   createdAt: Date;
 
-  @Prop({ type: Boolean, require: false, default: true })
+  @Prop({ type: Boolean, require: false, default: false })
   isMembership: boolean;
 
   static modelName = 'BlogModel';
@@ -25,9 +25,9 @@ export class Blog {
   static createBlog(dto: CreateBlogDto): BlogDocument {
     const blog = new this();
 
-    dto.name = blog.name;
-    dto.description = blog.description;
-    dto.websiteUrl = blog.websiteUrl;
+    blog.name = dto.name;
+    blog.description = dto.description;
+    blog.websiteUrl = dto.websiteUrl;
 
     return blog as BlogDocument;
   }
