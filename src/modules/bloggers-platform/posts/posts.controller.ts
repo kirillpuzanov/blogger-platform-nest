@@ -16,6 +16,7 @@ import { CreatePostInputDto } from './api/input-dto/create-post.input-dto';
 import { PostsService } from './application/posts.service';
 import { GetPostsQueryInputDto } from './api/input-dto/get-posts-query.input-dto';
 import { PostsQueryRepository } from './infra/posts.query.repository';
+import { ObjectIdValidationPipe } from '../../../core/pipes/object-id-validation.pipe';
 
 @Controller('posts')
 export class PostsController {
@@ -34,9 +35,11 @@ export class PostsController {
     return this.postsQueryRepository.getAll(query);
   }
 
-  @Get(':id')
+  @Get(':postId')
   @HttpCode(HttpStatus.OK)
-  async getById(@Param('id') postId: string): Promise<PostViewDto> {
+  async getById(
+    @Param('postId', ObjectIdValidationPipe) postId: string,
+  ): Promise<PostViewDto> {
     return this.postsQueryRepository.getByIdOrFail(postId);
   }
 
@@ -49,13 +52,16 @@ export class PostsController {
 
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async updatePost(@Param('id') id: string, @Body() body: CreatePostInputDto) {
+  async updatePost(
+    @Param('id', ObjectIdValidationPipe) id: string,
+    @Body() body: CreatePostInputDto,
+  ) {
     return this.postsService.updatePost(body, id);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deletePost(@Param('id') id: string) {
+  async deletePost(@Param('id', ObjectIdValidationPipe) id: string) {
     return this.postsService.deletePost(id);
   }
 
