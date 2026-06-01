@@ -1,5 +1,5 @@
 export enum PostsSortBy {
-  createdAt = 'createdAt',
-  title = 'title',
-  blogName = 'blogName',
+  CreatedAt = 'createdAt',
+  Title = 'title',
+  BlogName = 'blogName',
 }

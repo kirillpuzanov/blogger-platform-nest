@@ -46,8 +46,7 @@ export class BlogsQueryRepository {
     if (!blog) {
       throw new NotFoundException('blog for create post not found');
     }
-    const b = BlogViewDto.mapToView(blog);
-    console.log('bbb', b);
-    return b;
+
+    return BlogViewDto.mapToView(blog);
   }
 }

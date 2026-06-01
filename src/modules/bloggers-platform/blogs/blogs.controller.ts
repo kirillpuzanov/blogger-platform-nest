@@ -58,20 +58,23 @@ export class BlogsController {
 
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async updateBlog(@Param('id') id: string, @Body() body: CreateBlogInputDto) {
+  async updateBlog(
+    @Param('id', ObjectIdValidationPipe) id: string,
+    @Body() body: CreateBlogInputDto,
+  ) {
     return this.blogsService.updateBlog(body, id);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteBlog(@Param('id') id: string) {
+  async deleteBlog(@Param('id', ObjectIdValidationPipe) id: string) {
     return this.blogsService.deleteBlog(id);
   }
 
   @Get(':blogId/posts')
   @HttpCode(HttpStatus.OK)
   async getPostsByBlog(
-    @Param('blogId') blogId: string,
+    @Param('blogId', ObjectIdValidationPipe) blogId: string,
     @Query() query: GetPostsQueryInputDto,
   ) {
     return this.postsQueryRepository.getPostsByBlog(
@@ -84,7 +87,7 @@ export class BlogsController {
   @Post('/:blogId/posts')
   @HttpCode(HttpStatus.CREATED)
   async createPostByBlog(
-    @Param('blogId') blogId: string,
+    @Param('blogId', ObjectIdValidationPipe) blogId: string,
     @Body() body: CreatePostByBlogInputDto,
   ) {
     const { content, shortDescription, title } = body;

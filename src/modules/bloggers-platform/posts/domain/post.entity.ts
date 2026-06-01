@@ -1,41 +1,32 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreatePostDto } from '../dto/create-post.dto';
-import { CreatePostDomainDto } from './create-post.domain-dto';
+import { CreatePostDomainDto } from './dto/create-post.domain-dto';
+import { ExtendedLikesInfo } from './dto/extended-likes.schema';
 
-@Schema({ _id: false })
-export class NewestLike {
-  @Prop({ type: String, require: true })
-  addedAt: string;
+export const postTitleConstraints = {
+  minLength: 1,
+  maxLength: 30,
+};
 
-  @Prop({ type: String, require: true })
-  userId: string;
-
-  @Prop({ type: String, require: true })
-  login: string;
-}
-
-@Schema({ _id: false })
-export class ExtendedLikesInfo {
-  @Prop({ type: Number, require: true })
-  likesCount: number;
-
-  @Prop({ type: Number, require: true })
-  dislikesCount: number;
-
-  @Prop({ type: [NewestLike], require: true })
-  newestLikes: NewestLike[];
-}
+export const postDescriptionConstraints = {
+  minLength: 1,
+  maxLength: 100,
+};
+export const postContentConstraints = {
+  minLength: 1,
+  maxLength: 1000,
+};
 
 @Schema({ timestamps: true })
 export class Post {
-  @Prop({ type: String, require: true })
+  @Prop({ type: String, require: true, ...postTitleConstraints })
   title: string;
 
-  @Prop({ type: String, require: true })
+  @Prop({ type: String, require: true, ...postDescriptionConstraints })
   shortDescription: string;
 
-  @Prop({ type: String, require: true })
+  @Prop({ type: String, require: true, ...postContentConstraints })
   content: string;
 
   @Prop({ type: String, require: true })

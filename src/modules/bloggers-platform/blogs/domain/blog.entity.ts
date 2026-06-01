@@ -2,15 +2,31 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { CreateBlogDto } from '../dto/create-blog.dto';
 import { HydratedDocument, Model } from 'mongoose';
 
+export const blogNameConstraints = {
+  minLength: 1,
+  maxLength: 15,
+};
+
+export const blogDescriptionConstraints = {
+  minLength: 1,
+  maxLength: 500,
+};
+
+export const blogWebUrlConstraints = {
+  match: /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/,
+  minLength: 1,
+  maxLength: 100,
+};
+
 @Schema({ timestamps: true })
 export class Blog {
-  @Prop({ type: String, require: true })
+  @Prop({ type: String, require: true, ...blogNameConstraints })
   name: string;
 
-  @Prop({ type: String, require: true })
+  @Prop({ type: String, require: true, ...blogDescriptionConstraints })
   description: string;
 
-  @Prop({ type: String, require: true })
+  @Prop({ type: String, require: true, ...blogWebUrlConstraints })
   websiteUrl: string;
 
   @Prop({ type: Date, require: true })
@@ -28,7 +44,7 @@ export class Blog {
     blog.name = dto.name;
     blog.description = dto.description;
     blog.websiteUrl = dto.websiteUrl;
-    console.log('blog', blog);
+
     return blog as BlogDocument;
   }
 
