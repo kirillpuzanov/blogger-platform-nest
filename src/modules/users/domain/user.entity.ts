@@ -2,40 +2,29 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { randomUUID } from 'crypto';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreateUserDomainDto } from '../dto/create-user.dto';
+import { EmailConfirmation } from './email-confirmation.schema';
+import { RecoveryPassData } from './recovery-pass.schema';
 
-@Schema({ _id: false })
-export class EmailConfirmation {
-  @Prop({ type: String, required: true })
-  confirmationCode: string;
+export const loginConstraints = {
+  minLength: 3,
+  maxLength: 10,
+};
 
-  @Prop({ type: Date, required: true })
-  expirationDate: Date;
+export const passwordConstraints = {
+  minLength: 6,
+  maxLength: 20,
+};
 
-  @Prop({ type: Date, required: true })
-  sentDate: Date;
-
-  @Prop({ type: Boolean, required: true, default: false })
-  isConfirmed: boolean;
-}
-
-@Schema({ _id: false })
-export class RecoveryPassData {
-  @Prop({ type: String, required: true })
-  recoveryPassCode: string;
-
-  @Prop({ type: Date, required: true })
-  expirationCodeDate: Date;
-
-  @Prop({ type: Date, required: true })
-  sentCodeDate: Date;
-}
+export const emailConstraints = {
+  match: /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/,
+};
 
 @Schema({ timestamps: true })
 export class User {
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true, unique: true, ...loginConstraints })
   login: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true, unique: true, ...emailConstraints })
   email: string;
 
   @Prop({ type: String, required: true })

@@ -22,6 +22,7 @@ import {
 import { PostsQueryRepository } from '../posts/infra/posts.query.repository';
 import { PostsService } from '../posts/application/posts.service';
 import { GetPostsQueryInputDto } from '../posts/api/input-dto/get-posts-query.input-dto';
+import { ObjectIdValidationPipe } from '../../../core/pipes/object-id-validation.pipe';
 
 @Controller('blogs')
 export class BlogsController {
@@ -42,7 +43,9 @@ export class BlogsController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async getById(@Param('id') id: string): Promise<BlogViewDto> {
+  async getById(
+    @Param('id', ObjectIdValidationPipe) id: string,
+  ): Promise<BlogViewDto> {
     return this.blogsQueryRepository.getByIdOrFail(id);
   }
 

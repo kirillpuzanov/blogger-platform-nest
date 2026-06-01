@@ -6,6 +6,8 @@ import { UsersModule } from '../modules/users/users.module';
 import { settings } from '../setup/settings';
 import { TestingModule } from '../modules/testing/testing.module';
 import { BloggersPlatformModule } from '../modules/bloggers-platform/bloggers-platform.module';
+import { APP_FILTER } from '@nestjs/core';
+import { DomainHttpExceptionsFilter } from '../core/exceptions/filters/domain-exceptions.filter';
 
 @Module({
   imports: [
@@ -17,6 +19,14 @@ import { BloggersPlatformModule } from '../modules/bloggers-platform/bloggers-pl
     BloggersPlatformModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+
+    /** Регистрируем глобальные перехватчики ошибок, перед отправкой ответа клиету */
+    {
+      provide: APP_FILTER,
+      useClass: DomainHttpExceptionsFilter,
+    },
+  ],
 })
 export class AppModule {}
