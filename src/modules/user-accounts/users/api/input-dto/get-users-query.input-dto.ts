@@ -1,4 +1,4 @@
-import { BaseQueryParams } from '../../../../core/dto/base-query-params.input-dto';
+import { BaseQueryParams } from '../../../../../core/dto/base-query-params.input-dto';
 import { UsersSortBy } from './users-sort-by';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 

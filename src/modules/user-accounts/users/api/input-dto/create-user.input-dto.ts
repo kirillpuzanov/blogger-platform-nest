@@ -1,12 +1,12 @@
 import { CreateUserDto } from '../../dto/create-user.dto';
 import { IsEmail, IsString, Length, Matches } from 'class-validator';
-import { IsStringWithTrim } from '../../../../core/decorators/validation/is-string-with-trim';
+import { IsStringWithTrim } from '../../../../../core/decorators/validation/is-string-with-trim';
 import {
   emailConstraints,
   loginConstraints,
   passwordConstraints,
 } from '../../domain/user.entity';
-import { Trim } from '../../../../core/decorators/transform/trim';
+import { Trim } from '../../../../../core/decorators/transform/trim';
 
 export class CreateUserInputDto implements CreateUserDto {
   @IsString()

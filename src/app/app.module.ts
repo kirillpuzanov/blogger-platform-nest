@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UsersModule } from '../modules/users/users.module';
+import { UserAccountsModule } from '../modules/user-accounts/user-accounts.module';
 import { settings } from '../setup/settings';
 import { TestingModule } from '../modules/testing/testing.module';
 import { BloggersPlatformModule } from '../modules/bloggers-platform/bloggers-platform.module';
@@ -14,7 +14,7 @@ import { DomainHttpExceptionsFilter } from '../core/exceptions/filters/domain-ex
     MongooseModule.forRoot(settings.MONGO_URL, {
       dbName: settings.DB_NAME,
     }),
-    UsersModule,
+    UserAccountsModule,
     TestingModule,
     BloggersPlatformModule,
   ],

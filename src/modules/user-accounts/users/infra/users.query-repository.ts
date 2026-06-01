@@ -5,7 +5,7 @@ import type { UserModelType } from '../domain/user.entity';
 import { User } from '../domain/user.entity';
 import { UserViewDto } from '../api/view-dto/user.view-dto';
 import { GetUsersQueryInputDto } from '../api/input-dto/get-users-query.input-dto';
-import { PaginatedViewDto } from '../../../core/dto/base-paginated.view-dto';
+import { PaginatedViewDto } from '../../../../core/dto/base-paginated.view-dto';
 
 @Injectable()
 export class UsersQueryRepository {
