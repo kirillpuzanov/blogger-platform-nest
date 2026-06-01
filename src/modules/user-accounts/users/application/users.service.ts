@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, type UserModelType } from '../domain/user.entity';
 import { UsersRepository } from '../infra/users.repository';
-import { CryptoService } from './cryptoService';
+import { CryptoService } from './crypto.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 
 @Injectable()
