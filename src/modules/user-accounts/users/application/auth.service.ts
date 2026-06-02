@@ -40,24 +40,8 @@ export class AuthService {
 
     return { accessToken, refreshToken };
 
-    // todo sessions
-
-    // /** создаем сессию для этого утстройства */
-    // const { exp, iat } = this.jwtService.decodeToken(refreshToken);
-    // const session: AuthSessionDb = {
-    //   ip,
-    //   exp,
-    //   iat,
-    //   userId,
-    //   deviceId,
-    //   deviceName,
-    // };
-    // await this.sessionsRepository.createSession(session);
-    //
-    // return createResultObject({
-    //   status: ResultStatus.Success,
-    //   data: { accessToken, refreshToken },
-    // });
+    // todo - создаем сессию для этого утстройства
+    // ...
   }
 
   async checkCredentials(

@@ -3,7 +3,7 @@ import { Request } from 'express';
 import {
   DomainException,
   DomainExceptionCode,
-} from '../exceptions/domain.exception';
+} from '../../../../core/exceptions/domain.exception';
 
 @Injectable()
 export class BasicAuthGuard implements CanActivate {
