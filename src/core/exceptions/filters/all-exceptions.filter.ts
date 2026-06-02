@@ -11,12 +11,12 @@ import { DomainExceptionCode } from '../domain.exception';
 /** обработчик 500-х ошибок */
 @Catch()
 export class AllHttpExceptionsFilter implements ExceptionFilter {
-  catch(exception: any, host: ArgumentsHost): void {
+  catch(exception: Error, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    const message: string = exception.message || 'Unknown exception occurred.';
+    const message = exception?.message ?? 'Unknown exception occurred.';
     const status = HttpStatus.INTERNAL_SERVER_ERROR;
     const responseBody = this.buildResponseBody(request.url, message);
 
@@ -33,10 +33,8 @@ export class AllHttpExceptionsFilter implements ExceptionFilter {
     if (isProduction) {
       return {
         timestamp: new Date().toISOString(),
-        path: null,
         message: 'Some error occurred',
         errorsMessages: [],
-        code: DomainExceptionCode.InternalServerError,
       };
     }
 

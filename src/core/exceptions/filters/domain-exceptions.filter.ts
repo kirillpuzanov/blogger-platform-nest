@@ -49,11 +49,11 @@ export class DomainHttpExceptionsFilter implements ExceptionFilter {
     requestUrl: string,
   ): ErrorResponseBody {
     return {
-      timestamp: new Date().toISOString(),
       path: requestUrl,
       errorsMessages: exception.extensions,
       message: exception.message,
-      code: exception.code,
+      // timestamp: new Date().toISOString(),
+      // code: exception.code,
     };
   }
 }

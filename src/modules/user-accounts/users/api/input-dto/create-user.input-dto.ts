@@ -7,8 +7,10 @@ import {
   passwordConstraints,
 } from '../../domain/user.entity';
 import { Trim } from '../../../../../core/decorators/transform/trim';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserInputDto implements CreateUserDto {
+  @ApiProperty({ minLength: 3, maxLength: 30 })
   @IsString()
   @IsStringWithTrim(loginConstraints.minLength, loginConstraints.maxLength)
   login: string;
@@ -18,6 +20,7 @@ export class CreateUserInputDto implements CreateUserDto {
   @Trim()
   password: string;
 
+  @ApiProperty({ pattern: emailConstraints.match })
   @IsString()
   @Matches(emailConstraints.match)
   @IsEmail()

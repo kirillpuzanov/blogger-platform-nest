@@ -1,9 +1,9 @@
 import { DomainExceptionCode, Extension } from '../domain.exception';
 
 export type ErrorResponseBody = {
-  timestamp: string;
-  path: string | null;
+  message: string;
   errorsMessages: Extension[];
-  message?: string;
+  path?: string | null;
+  timestamp?: string;
   code?: DomainExceptionCode;
 };
