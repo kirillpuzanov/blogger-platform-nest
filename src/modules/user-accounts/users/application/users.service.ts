@@ -4,6 +4,10 @@ import { User, type UserModelType } from '../domain/user.entity';
 import { UsersRepository } from '../infra/users.repository';
 import { CryptoService } from './crypto.service';
 import { CreateUserDto } from '../dto/create-user.dto';
+import {
+  DomainException,
+  DomainExceptionCode,
+} from '../../../../core/exceptions/domain.exception';
 
 @Injectable()
 export class UsersService {
@@ -21,15 +25,21 @@ export class UsersService {
       await this.usersRepository.checkUniqueEmailOrLogin(email);
 
     if (emailAlreadyExist) {
-      // todo
-      // throw new DomainError('user with this email already exists', 'email');
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: 'Already exists',
+        extensions: [{ field: 'email', message: 'Already exists' }],
+      });
     }
 
     const loginAlreadyExist =
       await this.usersRepository.checkUniqueEmailOrLogin(login);
     if (loginAlreadyExist) {
-      // todo
-      // throw new DomainError('user with this login already exists', 'login');
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: 'Already exists',
+        extensions: [{ field: 'login', message: 'Already exists' }],
+      });
     }
 
     const passwordHash = await this.cryptoService.generateHash(password);

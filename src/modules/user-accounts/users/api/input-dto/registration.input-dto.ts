@@ -1,22 +1,18 @@
-import { CreateUserDto } from '../../dto/create-user.dto';
 import { IsEmail, IsString, Length, Matches } from 'class-validator';
-import { IsStringWithTrim } from '../../../../../core/decorators/validation/is-string-with-trim';
+import { Trim } from '../../../../../core/decorators/transform/trim';
 import {
   emailConstraints,
   loginConstraints,
   passwordConstraints,
 } from '../../domain/user.entity';
-import { Trim } from '../../../../../core/decorators/transform/trim';
+import { RegistrationDto } from '../../dto/registration.dto';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateUserInputDto implements CreateUserDto {
-  @ApiProperty({
-    minLength: loginConstraints.minLength,
-    maxLength: loginConstraints.maxLength,
-  })
+export class RegistrationInputDto implements RegistrationDto {
   @IsString()
+  @Length(loginConstraints.minLength, loginConstraints.maxLength)
   @Matches(loginConstraints.match)
-  @IsStringWithTrim(loginConstraints.minLength, loginConstraints.maxLength)
+  @Trim()
   login: string;
 
   @IsString()

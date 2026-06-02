@@ -11,6 +11,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { settings } from '../../setup/settings';
 import { JwtInternalService } from './users/application/jwt.service';
 import { AuthService } from './users/application/auth.service';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -25,6 +26,8 @@ import { AuthService } from './users/application/auth.service';
       secret: settings.JWT_SECRET,
       signOptions: { expiresIn: '60m' },
     }),
+
+    NotificationsModule,
   ],
   controllers: [UsersController, AuthController],
   providers: [

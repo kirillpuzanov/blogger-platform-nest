@@ -8,6 +8,7 @@ import { RecoveryPassData } from './recovery-pass.schema';
 export const loginConstraints = {
   minLength: 3,
   maxLength: 10,
+  match: /^[a-zA-Z0-9_-]*$/,
 };
 
 export const passwordConstraints = {
@@ -62,6 +63,10 @@ export class User {
       ),
     };
     return user as UserDocument;
+  }
+
+  updateIsConfirm() {
+    this.emailConfirmation.isConfirmed = true;
   }
 }
 
