@@ -87,9 +87,7 @@ export class AuthService {
     this.emailService
       .sendMail(
         user.email,
-        MailTemplates.registrationTemplate(
-          user.emailConfirmation.confirmationCode,
-        ),
+        MailTemplates.registration(user.emailConfirmation.confirmationCode),
       )
       .catch((error) => console.error('error send email', error));
   }
@@ -125,6 +123,36 @@ export class AuthService {
 
     user.updateIsConfirm();
     await this.usersRepository.save(user);
+  }
+
+  async resendConfirmCode(email: string): Promise<void> {
+    const user = await this.usersRepository.getByLoginOrEmail(email);
+
+    if (!user) {
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: 'user with this email does not exist',
+        extensions: [{ field: 'email', message: 'user does not exist' }],
+      });
+    }
+
+    if (user.emailConfirmation.isConfirmed) {
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: 'already confirmed',
+        extensions: [{ field: 'email', message: 'user is already confirmed' }],
+      });
+    }
+
+    user.updateConfirmationData();
+    await user.save();
+
+    this.emailService
+      .sendMail(
+        user.email,
+        MailTemplates.registration(user.emailConfirmation.confirmationCode),
+      )
+      .catch((error) => console.error('error send email', error));
   }
 
   async checkCredentials(

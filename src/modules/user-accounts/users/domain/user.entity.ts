@@ -49,24 +49,44 @@ export class User {
   ): UserDocument {
     const user = new this();
 
+    const { confirmationCode, expirationDate, sentDate } =
+      user.getNewConfirmationData();
+
     user.login = dto.login;
     user.email = dto.email;
     user.passwordHash = dto.passwordHash;
 
     user.createdAt = new Date();
     user.emailConfirmation = {
-      confirmationCode: randomUUID(),
-      sentDate: new Date(),
       isConfirmed: Boolean(isConfirmed),
-      expirationDate: new Date(
-        new Date().getTime() + 20 * 60 * 1000, // 20 min,
-      ),
+      confirmationCode,
+      expirationDate,
+      sentDate,
     };
     return user as UserDocument;
   }
 
+  getNewConfirmationData() {
+    return {
+      confirmationCode: randomUUID(),
+      sentDate: new Date(),
+      expirationDate: new Date(
+        new Date().getTime() + 20 * 60 * 1000, // 20 min,
+      ),
+    };
+  }
+
   updateIsConfirm() {
     this.emailConfirmation.isConfirmed = true;
+  }
+
+  updateConfirmationData() {
+    const { confirmationCode, expirationDate, sentDate } =
+      this.getNewConfirmationData();
+
+    this.emailConfirmation.confirmationCode = confirmationCode;
+    this.emailConfirmation.sentDate = sentDate;
+    this.emailConfirmation.expirationDate = expirationDate;
   }
 }
 

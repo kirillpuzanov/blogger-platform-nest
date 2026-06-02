@@ -1,5 +1,5 @@
 export class MailTemplates {
-  static registrationTemplate(code: string): string {
+  static registration(code: string): string {
     return `
         <h1>Thank for your registration</h1>
         <p>To finish registration please follow the link below:
@@ -8,7 +8,7 @@ export class MailTemplates {
     `;
   }
 
-  static recoveryPassTemplate(code: string): string {
+  static recoveryPass(code: string): string {
     return `
       <h1>Password recovery</h1>
        <p>To finish password recovery please follow the link below:

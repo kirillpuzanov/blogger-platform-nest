@@ -7,3 +7,7 @@ export class RegistrationDto {
 export class RegistrationConfirmDto {
   code: string;
 }
+
+export class RegistrationResendCodeDto {
+  email: string;
+}
