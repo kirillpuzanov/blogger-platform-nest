@@ -88,6 +88,10 @@ export class User {
     this.emailConfirmation.sentDate = sentDate;
     this.emailConfirmation.expirationDate = expirationDate;
   }
+
+  updatePasswordHash(newPasswordHash: string) {
+    this.passwordHash = newPasswordHash;
+  }
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

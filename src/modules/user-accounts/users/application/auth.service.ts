@@ -155,6 +155,58 @@ export class AuthService {
       .catch((error) => console.error('error send email', error));
   }
 
+  async recoveryPassword(email: string): Promise<void> {
+    const user = await this.usersRepository.getByLoginOrEmail(email);
+
+    /** если такого пользователя нет все-равно вернем 204, чтобы не раскрывать существование email */
+    if (!user) {
+      return;
+    }
+
+    user.updateConfirmationData();
+    await this.usersRepository.save(user);
+
+    this.emailService
+      .sendMail(
+        user.email,
+        MailTemplates.registration(user.emailConfirmation.confirmationCode),
+        'Подтвердите изменение пароля',
+      )
+      .catch((error) => console.error('error send recovery pass email', error));
+  }
+
+  async setNewPassword(
+    newPassword: string,
+    recoveryCode: string,
+  ): Promise<void> {
+    const user = await this.usersRepository.getByRecoveryPassCode(recoveryCode);
+
+    if (!user) {
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: 'invalid recovery code',
+        extensions: [{ field: 'recoveryCode', message: 'user does not exist' }],
+      });
+    }
+
+    const expirationCodeDate = user.recoveryPassData?.expirationCodeDate;
+
+    if (!expirationCodeDate || new Date() > expirationCodeDate) {
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: 'recovery code does not exist or is expired',
+        extensions: [
+          { field: 'recoveryCode', message: 'does not exist or is expired' },
+        ],
+      });
+    }
+
+    const newPasswordHash = await this.cryptoService.generateHash(newPassword);
+
+    user.updatePasswordHash(newPasswordHash);
+    await this.usersRepository.save(user);
+  }
+
   async checkCredentials(
     password: string,
     loginOrEmail: string,

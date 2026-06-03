@@ -5,6 +5,7 @@ import { ApiBody } from '@nestjs/swagger';
 import { RegistrationInputDto } from './api/input-dto/registration.input-dto';
 import { RegistrationConfirmInputDto } from './api/input-dto/registration-confirm.input-dto';
 import { RegistrationResendCodeInputDto } from './api/input-dto/registration-resend-code.input-dto';
+import { NewPasswordInputDto } from './api/input-dto/new-password.input-dto';
 
 @Controller('auth')
 export class AuthController {
@@ -47,5 +48,19 @@ export class AuthController {
   @ApiBody({ type: RegistrationResendCodeInputDto })
   async resendConfirmCode(@Body() body: RegistrationResendCodeInputDto) {
     return this.authService.resendConfirmCode(body.email);
+  }
+
+  @Post('password-recovery')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiBody({ type: RegistrationResendCodeInputDto })
+  async recoveryPass(@Body() body: RegistrationResendCodeInputDto) {
+    return this.authService.recoveryPassword(body.email);
+  }
+
+  @Post('new-password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiBody({ type: NewPasswordInputDto })
+  async setNewPassword(@Body() body: NewPasswordInputDto) {
+    return this.authService.setNewPassword(body.newPassword, body.recoveryCode);
   }
 }
