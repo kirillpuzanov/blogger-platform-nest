@@ -1,11 +1,15 @@
 import { ObjectId } from 'mongodb';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import type { UserModelType } from '../domain/user.entity';
 import { User } from '../domain/user.entity';
 import { UserViewDto } from '../api/view-dto/user.view-dto';
 import { GetUsersQueryInputDto } from '../api/input-dto/get-users-query.input-dto';
 import { PaginatedViewDto } from '../../../../core/dto/base-paginated.view-dto';
+import {
+  DomainException,
+  DomainExceptionCode,
+} from '../../../../core/exceptions/domain.exception';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -62,7 +66,10 @@ export class UsersQueryRepository {
     const user = await this.UserModel.findOne({ _id: new ObjectId(id) });
 
     if (!user) {
-      throw new NotFoundException('user not found');
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'user not found',
+      });
     }
 
     return UserViewDto.mapToView(user);

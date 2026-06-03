@@ -1,4 +1,12 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { LoginInputDto } from './api/input-dto/login.input-dto';
 import { AuthService } from './application/auth.service';
 import { ApiBody } from '@nestjs/swagger';
@@ -6,10 +14,26 @@ import { RegistrationInputDto } from './api/input-dto/registration.input-dto';
 import { RegistrationConfirmInputDto } from './api/input-dto/registration-confirm.input-dto';
 import { RegistrationResendCodeInputDto } from './api/input-dto/registration-resend-code.input-dto';
 import { NewPasswordInputDto } from './api/input-dto/new-password.input-dto';
+import { AccessAuthGuard } from './guards/access-auth.guard';
+import { ExtractUserFromRequest } from './decorators/extract-user-from-request.decorator';
+import { UsersQueryRepository } from './infra/users.query-repository';
+import { MeViewDto } from './api/view-dto/me.view-dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private usersQueryRepository: UsersQueryRepository,
+  ) {}
+
+  @Get('me')
+  @UseGuards(AccessAuthGuard)
+  async me(@ExtractUserFromRequest() user: { id: string }) {
+    const me = await this.usersQueryRepository.getByIdOrFail(user.id);
+    const { id, login, email } = me;
+    const meView: MeViewDto = { userId: id, login, email };
+    return meView;
+  }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
