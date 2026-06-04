@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Query,
@@ -17,6 +19,8 @@ import { PaginatedViewDto } from '../../../core/dto/base-paginated.view-dto';
 import { ObjectIdValidationPipe } from '../../../core/pipes/object-id-validation.pipe';
 import { BasicAuthGuard } from './guards/basic-auth.guard';
 import { ApiBasicAuth, ApiBody } from '@nestjs/swagger';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateUserCommand } from './usecases/admins/create-user.case';
 
 @Controller('users')
 @UseGuards(BasicAuthGuard)
@@ -25,6 +29,7 @@ export class UsersController {
   constructor(
     private usersQueryRepository: UsersQueryRepository,
     private usersService: UsersService,
+    private readonly commandBus: CommandBus,
   ) {}
 
   @Get()
@@ -37,11 +42,15 @@ export class UsersController {
   @Post()
   @ApiBody({ type: CreateUserInputDto })
   async createUser(@Body() body: CreateUserInputDto): Promise<UserViewDto> {
-    const createdUserId = await this.usersService.createUser(body);
+    const createdUserId = await this.commandBus.execute<
+      CreateUserCommand,
+      string
+    >(new CreateUserCommand(body));
     return this.usersQueryRepository.getByIdOrFail(createdUserId);
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(
     @Param('id', ObjectIdValidationPipe) id: string,
   ): Promise<void> {

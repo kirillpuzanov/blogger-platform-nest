@@ -12,6 +12,9 @@ import { settings } from '../../setup/settings';
 import { JwtInternalService } from './users/application/jwt.service';
 import { AuthService } from './users/application/auth.service';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { CreateUserUseCase } from './users/usecases/admins/create-user.case';
+
+const useCases = [CreateUserUseCase];
 
 @Module({
   imports: [
@@ -31,6 +34,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
   ],
   controllers: [UsersController, AuthController],
   providers: [
+    ...useCases,
     UsersService,
     UsersRepository,
     UsersQueryRepository,
