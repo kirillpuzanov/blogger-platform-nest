@@ -10,7 +10,6 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { BlogsService } from './application/blogs.service';
 import { BlogsQueryRepository } from './infra/blogs.query.repository';
 import { GetBlogsQueryInputDto } from './api/input-dto/get-blogs-query.input-dto';
 import { PaginatedViewDto } from '../../../core/dto/base-paginated.view-dto';
@@ -23,14 +22,18 @@ import { PostsQueryRepository } from '../posts/infra/posts.query.repository';
 import { PostsService } from '../posts/application/posts.service';
 import { GetPostsQueryInputDto } from '../posts/api/input-dto/get-posts-query.input-dto';
 import { ObjectIdValidationPipe } from '../../../core/pipes/object-id-validation.pipe';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateBlogCommand } from './usecases/create-blog.case';
+import { UpdateBlogCommand } from './usecases/update-blog.case';
+import { DeleteBlogCommand } from './usecases/delete-blog.case';
 
 @Controller('blogs')
 export class BlogsController {
   constructor(
     private blogsQueryRepository: BlogsQueryRepository,
-    private blogsService: BlogsService,
     private postsQueryRepository: PostsQueryRepository,
     private postsService: PostsService,
+    private readonly commandBus: CommandBus,
   ) {}
 
   @Get()
@@ -52,7 +55,9 @@ export class BlogsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createBlog(@Body() body: CreateBlogInputDto): Promise<BlogViewDto> {
-    const blogId = await this.blogsService.createBlog(body);
+    const blogId = await this.commandBus.execute<CreateBlogCommand, string>(
+      new CreateBlogCommand(body),
+    );
     return this.blogsQueryRepository.getByIdOrFail(blogId);
   }
 
@@ -62,13 +67,17 @@ export class BlogsController {
     @Param('id', ObjectIdValidationPipe) id: string,
     @Body() body: CreateBlogInputDto,
   ) {
-    return this.blogsService.updateBlog(body, id);
+    return this.commandBus.execute<UpdateBlogCommand, void>(
+      new UpdateBlogCommand(body, id),
+    );
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog(@Param('id', ObjectIdValidationPipe) id: string) {
-    return this.blogsService.deleteBlog(id);
+    return this.commandBus.execute<DeleteBlogCommand, void>(
+      new DeleteBlogCommand(id),
+    );
   }
 
   @Get(':blogId/posts')
