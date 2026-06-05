@@ -19,11 +19,11 @@ export class JwtInternalService {
   ): { accessToken: string; refreshToken: string } {
     const accessToken = this.jwtService.sign(
       { userId },
-      { secret: settings.JWT_SECRET, expiresIn: '5 Min' },
+      { secret: settings.JWT_SECRET_ACCESS, expiresIn: '5 Min' },
     );
     const refreshToken = this.jwtService.sign(
       { userId, deviceId },
-      { secret: settings.JWT_SECRET, expiresIn: '20 Min' },
+      { secret: settings.JWT_SECRET_ACCESS, expiresIn: '20 Min' },
     );
 
     return { accessToken, refreshToken };
@@ -40,10 +40,10 @@ export class JwtInternalService {
     };
   }
 
-  verifyToken(token: string): Partial<DecodedTokenData> {
+  verifyToken(token: string, secret: string): Partial<DecodedTokenData> {
     try {
       const verify = this.jwtService.verify<DecodedTokenData>(token, {
-        secret: settings.JWT_SECRET,
+        secret,
       });
       return {
         userId: verify.userId,

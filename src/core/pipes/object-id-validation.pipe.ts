@@ -10,7 +10,10 @@ import { ObjectId } from 'mongodb';
 @Injectable()
 export class ObjectIdValidationPipe implements PipeTransform {
   transform(value: unknown): ObjectId {
-    if (!isValidObjectId(value)) {
+    const receivedId =
+      value && typeof value === 'string' ? new ObjectId(value) : null;
+
+    if (!isValidObjectId(receivedId)) {
       throw new DomainException({
         code: DomainExceptionCode.ValidationError,
         message: 'Invalid id value',
@@ -18,6 +21,6 @@ export class ObjectIdValidationPipe implements PipeTransform {
       });
     }
 
-    return value as ObjectId;
+    return receivedId as ObjectId;
   }
 }

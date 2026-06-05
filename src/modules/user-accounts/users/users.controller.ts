@@ -13,7 +13,6 @@ import {
 import { CreateUserInputDto } from './api/input-dto/create-user.input-dto';
 import { UserViewDto } from './api/view-dto/user.view-dto';
 import { UsersQueryRepository } from './infra/users.query-repository';
-import { UsersService } from './application/users.service';
 import { GetUsersQueryInputDto } from './api/input-dto/get-users-query.input-dto';
 import { PaginatedViewDto } from '../../../core/dto/base-paginated.view-dto';
 import { ObjectIdValidationPipe } from '../../../core/pipes/object-id-validation.pipe';
@@ -21,6 +20,7 @@ import { BasicAuthGuard } from './guards/basic-auth.guard';
 import { ApiBasicAuth, ApiBody } from '@nestjs/swagger';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from './usecases/admins/create-user.case';
+import { DeleteUserCommand } from './usecases/admins/delete-user.case';
 
 @Controller('users')
 @UseGuards(BasicAuthGuard)
@@ -28,7 +28,6 @@ import { CreateUserCommand } from './usecases/admins/create-user.case';
 export class UsersController {
   constructor(
     private usersQueryRepository: UsersQueryRepository,
-    private usersService: UsersService,
     private readonly commandBus: CommandBus,
   ) {}
 
@@ -54,6 +53,6 @@ export class UsersController {
   async deleteUser(
     @Param('id', ObjectIdValidationPipe) id: string,
   ): Promise<void> {
-    return this.usersService.deleteOne(id);
+    return this.commandBus.execute(new DeleteUserCommand(id));
   }
 }

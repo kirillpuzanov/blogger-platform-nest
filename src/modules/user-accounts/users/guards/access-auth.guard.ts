@@ -5,6 +5,7 @@ import {
   DomainExceptionCode,
 } from '../../../../core/exceptions/domain.exception';
 import { JwtInternalService } from '../application/jwt.service';
+import { settings } from '../../../../setup/settings';
 
 @Injectable()
 export class AccessAuthGuard implements CanActivate {
@@ -22,7 +23,10 @@ export class AccessAuthGuard implements CanActivate {
     }
 
     const token = authHeader.split(' ')[1];
-    const { userId } = this.jwtService.verifyToken(token);
+    const { userId } = this.jwtService.verifyToken(
+      token,
+      settings.JWT_SECRET_ACCESS,
+    );
 
     if (userId) {
       request.user = { id: userId };
