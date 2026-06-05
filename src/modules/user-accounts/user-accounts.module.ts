@@ -8,12 +8,26 @@ import { CryptoService } from './users/application/crypto.service';
 import { AuthController } from './users/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtInternalService } from './users/application/jwt.service';
-import { AuthService } from './users/application/auth.service';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { CreateUserUseCase } from './users/usecases/admins/create-user.case';
 import { DeleteUserUseCase } from './users/usecases/admins/delete-user.case';
+import { LoginUseCase } from './users/usecases/login.case';
+import { RegistrationUseCase } from './users/usecases/registration.case';
+import { RegistrationConfirmUseCase } from './users/usecases/registrationConfirm.case';
+import { SetNewPassUseCase } from './users/usecases/setNewPass.case';
+import { RecoveryPassUseCase } from './users/usecases/recoveryPass.case';
+import { ResendConfirmCodeUseCase } from './users/usecases/resendConfirmCode.case';
 
-const useCases = [CreateUserUseCase, DeleteUserUseCase];
+const useCases = [
+  CreateUserUseCase,
+  DeleteUserUseCase,
+  LoginUseCase,
+  RegistrationUseCase,
+  RegistrationConfirmUseCase,
+  SetNewPassUseCase,
+  RecoveryPassUseCase,
+  ResendConfirmCodeUseCase,
+];
 
 @Module({
   imports: [
@@ -33,8 +47,6 @@ const useCases = [CreateUserUseCase, DeleteUserUseCase];
     ...useCases,
     UsersRepository,
     UsersQueryRepository,
-
-    AuthService,
 
     CryptoService,
     JwtInternalService,
