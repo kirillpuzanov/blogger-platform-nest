@@ -15,6 +15,11 @@ import { CreatePostUseCase } from './posts/useases/create-post.case';
 import { UpdatePostUseCase } from './posts/useases/update-post.case';
 import { DeletePostUseCase } from './posts/useases/delete-post.case';
 import { UpdatePostLikeCommand } from './posts/useases/update-post-like.case';
+import { CommentsQueryRepository } from './comments/infra/comments.query.repository';
+import { CommentsController } from './comments/comments.controller';
+import { UpdateCommentCommand } from './comments/usecases/update-comment.case';
+import { UpdateCommentLikeUseCase } from './comments/usecases/update-comment-like.case';
+import { DeleteCommentUseCase } from './comments/usecases/delete-comment.case';
 
 const cases = [
   CreateBlogUseCase,
@@ -25,6 +30,10 @@ const cases = [
   UpdatePostUseCase,
   DeletePostUseCase,
   UpdatePostLikeCommand,
+
+  UpdateCommentCommand,
+  DeleteCommentUseCase,
+  UpdateCommentLikeUseCase,
 ];
 
 @Module({
@@ -42,7 +51,7 @@ const cases = [
       },
     ]),
   ],
-  controllers: [BlogsController, PostsController],
+  controllers: [BlogsController, PostsController, CommentsController],
   providers: [
     ...cases,
 
@@ -51,6 +60,8 @@ const cases = [
 
     PostsRepository,
     PostsQueryRepository,
+
+    CommentsQueryRepository,
   ],
 })
 export class BloggersPlatformModule {}

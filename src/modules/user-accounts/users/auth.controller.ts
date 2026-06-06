@@ -16,7 +16,7 @@ import { RegistrationConfirmInputDto } from './api/input-dto/registration-confir
 import { RegistrationResendCodeInputDto } from './api/input-dto/registration-resend-code.input-dto';
 import { NewPasswordInputDto } from './api/input-dto/new-password.input-dto';
 import { AccessAuthGuard } from './guards/access-auth.guard';
-import { ExtractUserFromRequest } from './decorators/extract-user-from-request.decorator';
+import { ExtractUserFromRequest } from '../../../core/decorators/extract-user-from-request.decorator';
 import { UsersQueryRepository } from './infra/users.query-repository';
 import { MeViewDto } from './api/view-dto/me.view-dto';
 import { CommandBus } from '@nestjs/cqrs';

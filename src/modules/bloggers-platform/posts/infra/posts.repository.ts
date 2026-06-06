@@ -1,7 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument, type PostModelType } from '../domain/post.entity';
 import { ObjectId } from 'mongodb';
+import {
+  DomainException,
+  DomainExceptionCode,
+} from '../../../../core/exceptions/domain.exception';
 
 @Injectable()
 export class PostsRepository {
@@ -15,8 +19,10 @@ export class PostsRepository {
     const post = await this.PostModel.findOne({ _id: new ObjectId(id) });
 
     if (!post) {
-      //TODO: replace with domain exception
-      throw new NotFoundException('post not found');
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'post not found',
+      });
     }
     return post;
   }
@@ -25,8 +31,10 @@ export class PostsRepository {
     const res = await this.PostModel.deleteOne({ _id: new ObjectId(id) });
 
     if (res.deletedCount < 1) {
-      //TODO: replace with domain exception
-      throw new NotFoundException('post not found');
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'post not found',
+      });
     }
   }
 

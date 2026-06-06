@@ -78,11 +78,9 @@ export class PostsQueryRepository {
       throw new NotFoundException('blog does not exists', 'blogId');
     }
 
-    const skip = (pageNumber - 1) * pageSize;
-
     const postsByBlog = await this.PostModel.find({ blogId })
       .sort({ [sortBy]: sortDirection })
-      .skip(skip)
+      .skip(query.calculateSkip())
       .limit(pageSize)
       .lean();
     const totalCount = await this.PostModel.countDocuments({ blogId });

@@ -1,7 +1,11 @@
 import { Blog, BlogDocument, type BlogModelType } from '../domain/blog.entity';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
+import {
+  DomainException,
+  DomainExceptionCode,
+} from '../../../../core/exceptions/domain.exception';
 
 @Injectable()
 export class BlogsRepository {
@@ -14,8 +18,10 @@ export class BlogsRepository {
   async deleteById(id: string): Promise<void> {
     const res = await this.BlogModel.deleteOne({ _id: new ObjectId(id) });
     if (res.deletedCount < 1) {
-      //TODO: replace with domain exception
-      throw new NotFoundException('blog not found');
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'blog not found',
+      });
     }
   }
 
@@ -23,8 +29,10 @@ export class BlogsRepository {
     const blog = await this.BlogModel.findOne({ _id: new ObjectId(id) });
 
     if (!blog) {
-      //TODO: replace with domain exception
-      throw new NotFoundException('blog not found');
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'blog not found',
+      });
     }
     return blog;
   }
