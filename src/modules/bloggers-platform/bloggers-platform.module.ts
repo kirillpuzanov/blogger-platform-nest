@@ -20,6 +20,10 @@ import { CommentsController } from './comments/comments.controller';
 import { UpdateCommentCommand } from './comments/usecases/update-comment.case';
 import { UpdateCommentLikeUseCase } from './comments/usecases/update-comment-like.case';
 import { DeleteCommentUseCase } from './comments/usecases/delete-comment.case';
+import { LikeRepository } from './likes/infra/like.repository';
+import { LikeQueryRepository } from './likes/infra/like.query.repository';
+import { CommentsRepository } from './comments/infra/comments.repository';
+import { LikeService } from './likes/like.service';
 
 const cases = [
   CreateBlogUseCase,
@@ -61,7 +65,12 @@ const cases = [
     PostsRepository,
     PostsQueryRepository,
 
+    CommentsRepository,
     CommentsQueryRepository,
+
+    LikeService,
+    LikeRepository,
+    LikeQueryRepository,
   ],
 })
 export class BloggersPlatformModule {}

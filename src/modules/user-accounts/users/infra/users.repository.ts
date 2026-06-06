@@ -9,16 +9,6 @@ import { UserViewDto } from '../api/view-dto/user.view-dto';
 export class UsersRepository {
   constructor(@InjectModel(User.modelName) private UserModel: UserModelType) {}
 
-  // async create(user: UserDb): Promise<string> {
-  //   const createdUser = await UserModel.insertOne(user);
-  //   return createdUser._id.toString();
-  // }
-
-  // async update(_id: ObjectId, data: object): Promise<number> {
-  //   const result = await UserModel.updateOne({ _id }, { $set: data });
-  //   return result.modifiedCount;
-  // }
-
   async save(user: UserDocument) {
     await user.save();
   }
