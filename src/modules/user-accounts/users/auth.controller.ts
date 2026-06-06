@@ -5,8 +5,10 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Res,
   UseGuards,
 } from '@nestjs/common';
+import { type Response } from 'express';
 import { LoginInputDto } from './api/input-dto/login.input-dto';
 import { ApiBody } from '@nestjs/swagger';
 import { RegistrationInputDto } from './api/input-dto/registration.input-dto';
@@ -44,7 +46,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiBody({ type: LoginInputDto })
-  async login(@Body() body: LoginInputDto) {
+  async login(@Body() body: LoginInputDto, @Res() res: Response) {
     const tokens = await this.commandBus.execute<
       LoginCommand,
       LoginCommandReturn
@@ -57,7 +59,13 @@ export class AuthController {
       }),
     );
 
-    return { accessToken: tokens.accessToken };
+    return res
+      .cookie('refreshToken', tokens.refreshToken, {
+        httpOnly: true,
+        secure: true,
+      })
+      .status(HttpStatus.OK)
+      .json({ accessToken: tokens.accessToken });
   }
 
   @Post('registration')
