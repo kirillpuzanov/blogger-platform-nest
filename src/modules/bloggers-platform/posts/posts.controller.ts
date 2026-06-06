@@ -13,16 +13,19 @@ import {
 import { PaginatedViewDto } from '../../../core/dto/base-paginated.view-dto';
 import { PostViewDto } from './api/view-dto/post.view-dto';
 import { CreatePostInputDto } from './api/input-dto/create-post.input-dto';
-import { PostsService } from './application/posts.service';
 import { GetPostsQueryInputDto } from './api/input-dto/get-posts-query.input-dto';
 import { PostsQueryRepository } from './infra/posts.query.repository';
 import { ObjectIdValidationPipe } from '../../../core/pipes/object-id-validation.pipe';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreatePostCommand } from './useases/create-post.case';
+import { UpdatePostCommand } from './useases/update-post.case';
+import { DeletePostCommand } from './useases/delete-post.case';
 
 @Controller('posts')
 export class PostsController {
   constructor(
     private postsQueryRepository: PostsQueryRepository,
-    private postsService: PostsService,
+    private readonly commandBus: CommandBus,
     // private commentsQueryRepository: CommentsQueryRepository,
     // private commentService: CommentService,
   ) {}
@@ -46,7 +49,9 @@ export class PostsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createPost(@Body() body: CreatePostInputDto): Promise<PostViewDto> {
-    const postId = await this.postsService.createPost(body);
+    const postId = await this.commandBus.execute<CreatePostCommand, string>(
+      new CreatePostCommand(body),
+    );
     return this.postsQueryRepository.getByIdOrFail(postId);
   }
 
@@ -56,13 +61,17 @@ export class PostsController {
     @Param('id', ObjectIdValidationPipe) id: string,
     @Body() body: CreatePostInputDto,
   ) {
-    return this.postsService.updatePost(body, id);
+    return this.commandBus.execute<UpdatePostCommand, void>(
+      new UpdatePostCommand(body, id),
+    );
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(@Param('id', ObjectIdValidationPipe) id: string) {
-    return this.postsService.deletePost(id);
+    return this.commandBus.execute<DeletePostCommand, void>(
+      new DeletePostCommand(id),
+    );
   }
 
   // @Put(':id/like-status')

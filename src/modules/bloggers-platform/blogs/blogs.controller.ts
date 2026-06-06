@@ -19,20 +19,19 @@ import {
   CreatePostByBlogInputDto,
 } from './api/input-dto/create-blog.input-dto';
 import { PostsQueryRepository } from '../posts/infra/posts.query.repository';
-import { PostsService } from '../posts/application/posts.service';
 import { GetPostsQueryInputDto } from '../posts/api/input-dto/get-posts-query.input-dto';
 import { ObjectIdValidationPipe } from '../../../core/pipes/object-id-validation.pipe';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateBlogCommand } from './usecases/create-blog.case';
 import { UpdateBlogCommand } from './usecases/update-blog.case';
 import { DeleteBlogCommand } from './usecases/delete-blog.case';
+import { CreatePostCommand } from '../posts/useases/create-post.case';
 
 @Controller('blogs')
 export class BlogsController {
   constructor(
     private blogsQueryRepository: BlogsQueryRepository,
     private postsQueryRepository: PostsQueryRepository,
-    private postsService: PostsService,
     private readonly commandBus: CommandBus,
   ) {}
 
@@ -100,12 +99,17 @@ export class BlogsController {
     @Body() body: CreatePostByBlogInputDto,
   ) {
     const { content, shortDescription, title } = body;
-    const createdPostId = await this.postsService.createPost({
-      content,
-      shortDescription,
-      title,
-      blogId,
-    });
+    const createdPostId = await this.commandBus.execute<
+      CreatePostCommand,
+      string
+    >(
+      new CreatePostCommand({
+        content,
+        shortDescription,
+        title,
+        blogId,
+      }),
+    );
 
     return this.postsQueryRepository.getByIdOrFail(
       createdPostId,
