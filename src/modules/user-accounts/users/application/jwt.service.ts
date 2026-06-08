@@ -19,7 +19,7 @@ export class JwtInternalService {
   ): { accessToken: string; refreshToken: string } {
     const accessToken = this.jwtService.sign(
       { userId },
-      { secret: settings.JWT_SECRET_ACCESS, expiresIn: '5 Min' },
+      { secret: settings.JWT_SECRET_ACCESS, expiresIn: '10 Min' },
     );
     const refreshToken = this.jwtService.sign(
       { userId, deviceId },
@@ -32,8 +32,8 @@ export class JwtInternalService {
   decodeToken(token: string): DecodedTokenData {
     const decoded = this.jwtService.decode<DecodedTokenData>(token);
     return {
-      userId: decoded.userId,
-      deviceId: decoded.deviceId,
+      userId: decoded?.userId,
+      deviceId: decoded?.deviceId,
       /**  переводим в миллисеунды, для удобства сравнения дальше */
       exp: decoded?.exp ? decoded.exp * 1000 : Date.now(),
       iat: decoded?.iat ? decoded.iat * 1000 : Date.now(),

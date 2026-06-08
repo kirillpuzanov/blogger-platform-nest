@@ -23,7 +23,7 @@ export class CreateCommentUseCase implements ICommandHandler<CreateCommentComman
     private usersRepository: UsersRepository, // todo external
   ) {}
 
-  async execute({ dto }: CreateCommentCommand): Promise<void> {
+  async execute({ dto }: CreateCommentCommand): Promise<string> {
     const { userId, content, postId } = dto;
 
     const post = await this.postsRepository.findByIdOrFail(postId);
@@ -45,5 +45,7 @@ export class CreateCommentUseCase implements ICommandHandler<CreateCommentComman
     });
 
     await this.commentsRepository.save(newComment);
+
+    return newComment._id.toString();
   }
 }

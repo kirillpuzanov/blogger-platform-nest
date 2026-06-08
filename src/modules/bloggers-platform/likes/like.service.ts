@@ -3,7 +3,6 @@ import { LikeRepository } from './infra/like.repository';
 import { UsersRepository } from '../../user-accounts/users/infra/users.repository';
 import { LikeStatus } from '../../../core/dto/like-status';
 import { LikeCountUpdateDto } from './dto/like-count-update.dto';
-import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Like, type LikeModelType } from './domain/like.entity';
 
@@ -21,7 +20,8 @@ export class LikeService {
     parentId: string,
     newLikeStatus: LikeStatus,
   ): Promise<LikeCountUpdateDto> {
-    const session = await mongoose.startSession();
+    const session = await this.LikeModel.db.startSession();
+
     session.startTransaction();
 
     let likesCountDelta: LikeCountUpdateDto = {};
@@ -38,6 +38,12 @@ export class LikeService {
         return likesCountDelta;
       }
 
+      /** считаем дельты для изменения счетчиков в parent-сущности */
+      likesCountDelta = this.calculateCountersDelta(
+        existingLike?.status,
+        newLikeStatus,
+      );
+
       /** если лайка нет - создадим */
       if (!existingLike) {
         const user = await this.usersRepository.getById(userId);
@@ -52,12 +58,6 @@ export class LikeService {
         existingLike.updateLikeStatus(newLikeStatus);
         await this.likeRepository.save(existingLike);
       }
-
-      /** считаем дельты для изменения счетчиков в parent-сущности */
-      likesCountDelta = this.calculateCountersDelta(
-        existingLike?.status,
-        newLikeStatus,
-      );
 
       await session.commitTransaction();
 

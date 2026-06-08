@@ -37,12 +37,15 @@ export class Comment {
     comment.postId = dto.postId;
     comment.content = dto.content;
     comment.blogId = dto.blogId;
-    comment.commentatorInfo.userId = dto.userId;
-    comment.commentatorInfo.userLogin = dto.login;
+    comment.commentatorInfo = {
+      userId: dto.userId,
+      userLogin: dto.login,
+    };
     comment.createdAt = new Date();
-
-    comment.likesInfo.likesCount = 0;
-    comment.likesInfo.dislikesCount = 0;
+    comment.likesInfo = {
+      likesCount: 0,
+      dislikesCount: 0,
+    };
 
     return comment as CommentDocument;
   }

@@ -96,7 +96,7 @@ export class PostsController {
     );
   }
 
-  @Get(':id/comments')
+  @Get(':postId/comments')
   @HttpCode(HttpStatus.OK)
   @UseGuards(OptionalAccessAuthGuard)
   async getCommentsByPost(

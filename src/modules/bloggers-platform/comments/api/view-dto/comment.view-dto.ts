@@ -27,12 +27,16 @@ export class CommentViewDto {
     dto.content = comment.content;
     dto.createdAt = comment.createdAt;
 
-    dto.commentatorInfo.userId = comment.commentatorInfo.userId;
-    dto.commentatorInfo.userLogin = comment.commentatorInfo.userLogin;
+    dto.commentatorInfo = {
+      userId: comment.commentatorInfo.userId,
+      userLogin: comment.commentatorInfo.userLogin,
+    };
 
-    dto.likesInfo.likesCount = comment.likesInfo.likesCount || 0;
-    dto.likesInfo.dislikesCount = comment.likesInfo.dislikesCount || 0;
-    dto.likesInfo.myStatus = userLikes[dto.id] ?? LikeStatus.None;
+    dto.likesInfo = {
+      likesCount: comment.likesInfo.likesCount || 0,
+      dislikesCount: comment.likesInfo.dislikesCount || 0,
+      myStatus: userLikes[dto.id] ?? LikeStatus.None,
+    };
 
     return dto;
   }

@@ -15,10 +15,10 @@ export class OptionalAccessAuthGuard implements CanActivate {
     }
 
     const token = authHeader.split(' ')[1];
-    const { userId } = this.jwtService.decodeToken(token);
+    const userInfo = this.jwtService.decodeToken(token);
 
-    if (userId) {
-      request.user = { id: userId };
+    if (userInfo?.userId) {
+      request.user = { id: userInfo?.userId };
     }
     return true;
   }

@@ -1,6 +1,5 @@
 import { HydratedDocument, Model } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Comment } from '../../comments/domain/comment.entity';
 import { LikeStatus } from '../../../../core/dto/like-status';
 import { CreateLikeDto } from './create-like.dto';
 
@@ -21,7 +20,12 @@ export class Like {
   @Prop({ type: Date, require: true })
   createdAt: Date;
 
-  @Prop({ type: LikeStatus, require: true, default: 'None' })
+  @Prop({
+    type: String,
+    enum: Object.values(LikeStatus),
+    require: true,
+    default: LikeStatus.None,
+  })
   status: LikeStatus;
 
   @Prop({ type: LikeAuthor, require: true })
@@ -35,8 +39,10 @@ export class Like {
     like.parentId = dto.parentId;
     like.status = dto.status;
     like.createdAt = new Date();
-    like.author.userId = dto.userId;
-    like.author.userLogin = dto.userLogin;
+    like.author = {
+      userId: dto.userId,
+      userLogin: dto.userLogin,
+    };
 
     return like as LikeDocument;
   }
@@ -50,9 +56,9 @@ export class Like {
   }
 }
 
-export const LikeSchema = SchemaFactory.createForClass(Comment);
+export const LikeSchema = SchemaFactory.createForClass(Like);
 //регистрирует методы сущности в схеме
-LikeSchema.loadClass(Comment);
+LikeSchema.loadClass(Like);
 
 //Типизация документа
 export type LikeDocument = HydratedDocument<Like>;
