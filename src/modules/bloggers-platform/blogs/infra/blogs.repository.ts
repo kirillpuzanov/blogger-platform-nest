@@ -36,13 +36,4 @@ export class BlogsRepository {
     }
     return blog;
   }
-
-  // async update(updatedBlog: CreateBlogInput, id: string): Promise<number> {
-  //   const { name, description, websiteUrl } = updatedBlog;
-  //   const res = await BlogModel.updateOne(
-  //     { _id: new ObjectId(id) },
-  //     { $set: { name, description, websiteUrl } },
-  //   );
-  //   return res.matchedCount;
-  // }
 }

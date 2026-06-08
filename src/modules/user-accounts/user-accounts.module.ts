@@ -51,6 +51,6 @@ const useCases = [
     CryptoService,
     JwtInternalService,
   ],
-  // exports: [JwtInternalService], // todo нужно ли отдавать наружу JwtInternalService ??
+  exports: [UsersRepository, JwtInternalService],
 })
 export class UserAccountsModule {}

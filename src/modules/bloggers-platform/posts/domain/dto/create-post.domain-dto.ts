@@ -12,8 +12,8 @@ export class CreatePostDomainDto {
   };
 }
 
-type NewestLikes = {
-  addedAt: string;
+export type NewestLikes = {
+  addedAt: Date;
   userId: string;
   login: string;
 };

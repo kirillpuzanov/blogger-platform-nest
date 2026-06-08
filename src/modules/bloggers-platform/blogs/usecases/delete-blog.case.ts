@@ -1,5 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BlogsRepository } from '../infra/blogs.repository';
+import { PostsRepository } from '../../posts/infra/posts.repository';
+import { CommentsRepository } from '../../comments/infra/comments.repository';
 
 export class DeleteBlogCommand {
   constructor(public id: string) {}
@@ -7,18 +9,19 @@ export class DeleteBlogCommand {
 
 @CommandHandler(DeleteBlogCommand)
 export class DeleteBlogUseCase implements ICommandHandler<DeleteBlogCommand> {
-  constructor(private blogsRepository: BlogsRepository) {}
+  constructor(
+    private blogsRepository: BlogsRepository,
+    private postsRepository: PostsRepository,
+    private commentsRepository: CommentsRepository,
+  ) {}
 
   async execute({ id }: DeleteBlogCommand): Promise<void> {
     await this.blogsRepository.deleteById(id);
 
-    // todo
-    // /** удаляем посты привязанные к этому блогу */
-    // await this.postsService.deleteManyPost({ blogId: id });
-    //
-    // todo
-    // /** удаляем комментарии привязанные постам блога */
-    // await this.commentService.deleteManyComments({ blogId: id });
-    return;
+    /** удаляем посты привязанные к этому блогу */
+    await this.postsRepository.deleteMany({ blogId: id });
+
+    /** удаляем комментарии привязанные постам блога */
+    await this.commentsRepository.deleteMany(id);
   }
 }

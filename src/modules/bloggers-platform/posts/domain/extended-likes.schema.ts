@@ -1,5 +1,5 @@
 import { Prop, Schema } from '@nestjs/mongoose';
-import { NewestLike } from '../newest-like.schema';
+import { NewestLike } from './newest-like.schema';
 
 @Schema({ _id: false })
 export class ExtendedLikesInfo {

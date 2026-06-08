@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreatePostDto } from '../dto/create-post.dto';
-import { CreatePostDomainDto } from './dto/create-post.domain-dto';
-import { ExtendedLikesInfo } from './dto/extended-likes.schema';
+import { CreatePostDomainDto, NewestLikes } from './dto/create-post.domain-dto';
+import { ExtendedLikesInfo } from './extended-likes.schema';
 
 export const postTitleConstraints = {
   minLength: 1,
@@ -63,6 +63,18 @@ export class Post {
     this.shortDescription = dto.shortDescription;
     this.content = dto.content;
     this.blogId = dto.blogId;
+  }
+
+  updateLikeCount(likesCount: number, dislikesCount: number) {
+    this.extendedLikesInfo.likesCount =
+      this.extendedLikesInfo.likesCount + likesCount;
+
+    this.extendedLikesInfo.dislikesCount =
+      this.extendedLikesInfo.dislikesCount + dislikesCount;
+  }
+
+  updateNewestLikes(newestLikes: NewestLikes[]) {
+    this.extendedLikesInfo.newestLikes = newestLikes;
   }
 }
 

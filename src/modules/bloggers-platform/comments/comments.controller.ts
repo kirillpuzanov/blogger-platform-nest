@@ -19,6 +19,8 @@ import { CommandBus } from '@nestjs/cqrs';
 import { UpdateCommentCommand } from './usecases/update-comment.case';
 import { DeleteCommentCommand } from './usecases/delete-comment.case';
 import { UpdateCommentLikeCommand } from './usecases/update-comment-like.case';
+import { OptionalAccessAuthGuard } from '../../user-accounts/users/guards/optional-access-auth.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('comments')
 export class CommentsController {
@@ -29,16 +31,15 @@ export class CommentsController {
 
   @Get(':commentId')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(OptionalAccessAuthGuard)
   async getComment(
     @Param('commentId', ObjectIdValidationPipe) commentId: string,
-    // @ExtractUserFromRequest() user: { id: string },
+    @ExtractUserFromRequest() user: { id: string },
   ) {
-    return this.commentsQueryRepository.getById(
-      commentId,
-      // user.id // todo
-    );
+    return this.commentsQueryRepository.getById(commentId, user.id);
   }
 
+  @ApiBearerAuth()
   @Put(':commentId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AccessAuthGuard)
@@ -52,6 +53,7 @@ export class CommentsController {
     );
   }
 
+  @ApiBearerAuth()
   @Delete(':commentId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AccessAuthGuard)
@@ -64,7 +66,8 @@ export class CommentsController {
     );
   }
 
-  @Delete(':commentId/like-status')
+  @ApiBearerAuth()
+  @Put(':commentId/like-status')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AccessAuthGuard)
   async updateLikeStatus(

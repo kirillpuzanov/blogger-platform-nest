@@ -1,6 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BlogsRepository } from '../infra/blogs.repository';
 import { CreateBlogInputDto } from '../api/input-dto/create-blog.input-dto';
+import { PostsRepository } from '../../posts/infra/posts.repository';
 
 export class UpdateBlogCommand {
   constructor(
@@ -11,7 +12,10 @@ export class UpdateBlogCommand {
 
 @CommandHandler(UpdateBlogCommand)
 export class UpdateBlogUseCase implements ICommandHandler<UpdateBlogCommand> {
-  constructor(private blogsRepository: BlogsRepository) {}
+  constructor(
+    private blogsRepository: BlogsRepository,
+    private postsRepository: PostsRepository,
+  ) {}
 
   async execute({ dto, id }: UpdateBlogCommand): Promise<void> {
     const blog = await this.blogsRepository.findByIdOrFail(id);
@@ -21,10 +25,11 @@ export class UpdateBlogUseCase implements ICommandHandler<UpdateBlogCommand> {
     await this.blogsRepository.save(blog);
 
     if (oldBlogName !== dto.name) {
-      // todo (проверить- если имя изменилось то ->)
-      // /** обновим имя блога в привязанных к нему постах */
-      // await this.postsService.updateManyPost({ blogId: id }, { blogName: name });
-      // return;
+      /** обновим имя блога в привязанных к нему постах */
+      await this.postsRepository.updateMany(
+        { blogId: id },
+        { blogName: dto.name },
+      );
     }
   }
 }

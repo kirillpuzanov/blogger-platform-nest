@@ -1,6 +1,6 @@
 import { PostDocument } from '../../domain/post.entity';
 import { LikeStatus } from '../../../../../core/dto/like-status';
-import { ExtendedLikesInfo } from '../../domain/dto/extended-likes.schema';
+import { ExtendedLikesInfo } from '../../domain/extended-likes.schema';
 
 export class PostViewDto {
   id: string;

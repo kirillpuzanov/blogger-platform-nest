@@ -9,6 +9,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { BlogsQueryRepository } from './infra/blogs.query.repository';
 import { GetBlogsQueryInputDto } from './api/input-dto/get-blogs-query.input-dto';
@@ -26,6 +27,10 @@ import { CreateBlogCommand } from './usecases/create-blog.case';
 import { UpdateBlogCommand } from './usecases/update-blog.case';
 import { DeleteBlogCommand } from './usecases/delete-blog.case';
 import { CreatePostCommand } from '../posts/useases/create-post.case';
+import { OptionalAccessAuthGuard } from '../../user-accounts/users/guards/optional-access-auth.guard';
+import { ApiBasicAuth } from '@nestjs/swagger';
+import { BasicAuthGuard } from '../../user-accounts/users/guards/basic-auth.guard';
+import { ExtractUserFromRequest } from '../../../core/decorators/extract-user-from-request.decorator';
 
 @Controller('blogs')
 export class BlogsController {
@@ -51,8 +56,10 @@ export class BlogsController {
     return this.blogsQueryRepository.getByIdOrFail(id);
   }
 
+  @ApiBasicAuth()
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @UseGuards(BasicAuthGuard)
   async createBlog(@Body() body: CreateBlogInputDto): Promise<BlogViewDto> {
     const blogId = await this.commandBus.execute<CreateBlogCommand, string>(
       new CreateBlogCommand(body),
@@ -60,8 +67,10 @@ export class BlogsController {
     return this.blogsQueryRepository.getByIdOrFail(blogId);
   }
 
+  @ApiBasicAuth()
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BasicAuthGuard)
   async updateBlog(
     @Param('id', ObjectIdValidationPipe) id: string,
     @Body() body: CreateBlogInputDto,
@@ -71,8 +80,10 @@ export class BlogsController {
     );
   }
 
+  @ApiBasicAuth()
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BasicAuthGuard)
   async deleteBlog(@Param('id', ObjectIdValidationPipe) id: string) {
     return this.commandBus.execute<DeleteBlogCommand, void>(
       new DeleteBlogCommand(id),
@@ -81,22 +92,23 @@ export class BlogsController {
 
   @Get(':blogId/posts')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(OptionalAccessAuthGuard)
   async getPostsByBlog(
     @Param('blogId', ObjectIdValidationPipe) blogId: string,
     @Query() query: GetPostsQueryInputDto,
+    @ExtractUserFromRequest() user: { id: string },
   ) {
-    return this.postsQueryRepository.getPostsByBlog(
-      blogId,
-      query,
-      // userId todo
-    );
+    return this.postsQueryRepository.getPostsByBlog(blogId, query, user?.id);
   }
 
+  @ApiBasicAuth()
   @Post('/:blogId/posts')
   @HttpCode(HttpStatus.CREATED)
+  @UseGuards(BasicAuthGuard)
   async createPostByBlog(
     @Param('blogId', ObjectIdValidationPipe) blogId: string,
     @Body() body: CreatePostByBlogInputDto,
+    @ExtractUserFromRequest() user: { id: string },
   ) {
     const { content, shortDescription, title } = body;
     const createdPostId = await this.commandBus.execute<
@@ -111,9 +123,6 @@ export class BlogsController {
       }),
     );
 
-    return this.postsQueryRepository.getByIdOrFail(
-      createdPostId,
-      // userId, todo
-    );
+    return this.postsQueryRepository.getByIdOrFail(createdPostId, user?.id);
   }
 }

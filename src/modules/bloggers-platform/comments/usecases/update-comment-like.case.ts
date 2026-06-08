@@ -5,6 +5,7 @@ import {
   DomainException,
   DomainExceptionCode,
 } from '../../../../core/exceptions/domain.exception';
+import { LikeService } from '../../likes/like.service';
 
 export class UpdateCommentLikeCommand {
   constructor(
@@ -16,7 +17,10 @@ export class UpdateCommentLikeCommand {
 
 @CommandHandler(UpdateCommentLikeCommand)
 export class UpdateCommentLikeUseCase implements ICommandHandler<UpdateCommentLikeCommand> {
-  constructor(private commentsRepository: CommentsRepository) {}
+  constructor(
+    private commentsRepository: CommentsRepository,
+    private likeService: LikeService,
+  ) {}
 
   async execute({
     userId,
@@ -32,23 +36,21 @@ export class UpdateCommentLikeUseCase implements ICommandHandler<UpdateCommentLi
       });
     }
 
-    // todo;
-    // /** обновляем лайк / получаем дельту для изменения счетчика */
-    // const { status, data } = await this.likeService.updateLike(
-    //   userId,
-    //   commentId,
-    //   newLikeStatus,
-    // );
-    //
-    // /** обновляем счетчик лайков комментария */
-    // if (
-    //   data &&
-    //   status === ResultStatus.NoContent &&
-    //   Object.keys(data).length > 0
-    // ) {
-    //   comment.updateLikeCount(data.likesCount ?? 0, data.dislikesCount ?? 0);
-    //
-    //   await this.commentsRepository.save(comment);
-    // }
+    /** обновляем лайк / получаем дельту для изменения счетчика */
+    const likeCountData = await this.likeService.updateLike(
+      userId,
+      commentId,
+      newLikeStatus,
+    );
+
+    /** обновляем счетчик лайков комментария */
+    if (likeCountData && Object.keys(likeCountData).length > 0) {
+      comment.updateLikeCount(
+        likeCountData.likesCount ?? 0,
+        likeCountData.dislikesCount ?? 0,
+      );
+
+      await this.commentsRepository.save(comment);
+    }
   }
 }

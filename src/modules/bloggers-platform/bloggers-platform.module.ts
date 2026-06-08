@@ -14,16 +14,20 @@ import { DeleteBlogUseCase } from './blogs/usecases/delete-blog.case';
 import { CreatePostUseCase } from './posts/useases/create-post.case';
 import { UpdatePostUseCase } from './posts/useases/update-post.case';
 import { DeletePostUseCase } from './posts/useases/delete-post.case';
-import { UpdatePostLikeCommand } from './posts/useases/update-post-like.case';
+import { UpdatePostLikeUseCase } from './posts/useases/update-post-like.case';
 import { CommentsQueryRepository } from './comments/infra/comments.query.repository';
 import { CommentsController } from './comments/comments.controller';
-import { UpdateCommentCommand } from './comments/usecases/update-comment.case';
+import { UpdateCommentUseCase } from './comments/usecases/update-comment.case';
 import { UpdateCommentLikeUseCase } from './comments/usecases/update-comment-like.case';
 import { DeleteCommentUseCase } from './comments/usecases/delete-comment.case';
 import { LikeRepository } from './likes/infra/like.repository';
 import { LikeQueryRepository } from './likes/infra/like.query.repository';
 import { CommentsRepository } from './comments/infra/comments.repository';
 import { LikeService } from './likes/like.service';
+import { CreateCommentUseCase } from './comments/usecases/create-comment.case';
+import { Comment, CommentSchema } from './comments/domain/comment.entity';
+import { Like, LikeSchema } from './likes/domain/like.entity';
+import { UserAccountsModule } from '../user-accounts/user-accounts.module';
 
 const cases = [
   CreateBlogUseCase,
@@ -33,11 +37,12 @@ const cases = [
   CreatePostUseCase,
   UpdatePostUseCase,
   DeletePostUseCase,
-  UpdatePostLikeCommand,
+  UpdatePostLikeUseCase,
 
-  UpdateCommentCommand,
+  UpdateCommentUseCase,
   DeleteCommentUseCase,
   UpdateCommentLikeUseCase,
+  CreateCommentUseCase,
 ];
 
 @Module({
@@ -53,7 +58,19 @@ const cases = [
         schema: PostSchema,
         collection: Post.collectionName,
       },
+      {
+        name: Comment.modelName,
+        schema: CommentSchema,
+        collection: Comment.collectionName,
+      },
+      {
+        name: Like.modelName,
+        schema: LikeSchema,
+        collection: Like.collectionName,
+      },
     ]),
+
+    UserAccountsModule,
   ],
   controllers: [BlogsController, PostsController, CommentsController],
   providers: [

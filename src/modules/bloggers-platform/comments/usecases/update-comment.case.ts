@@ -1,6 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CommentsRepository } from '../infra/comments.repository';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  DomainException,
+  DomainExceptionCode,
+} from '../../../../core/exceptions/domain.exception';
 
 export class UpdateCommentCommand {
   constructor(
@@ -23,12 +26,18 @@ export class UpdateCommentUseCase implements ICommandHandler<UpdateCommentComman
 
     /** такого коммента нет в БД */
     if (!comment) {
-      throw new NotFoundException('comment not found');
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'comment not found',
+      });
     }
 
     /** комментарий был создан не этим пользователем */
     if (comment.commentatorInfo?.userId !== userId) {
-      throw new ForbiddenException();
+      throw new DomainException({
+        code: DomainExceptionCode.Forbidden,
+        message: 'no access',
+      });
     }
 
     comment.updateComment(content);

@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { CommentatorInfo, LikesInfo } from './comment-additional.schema';
 import { HydratedDocument, Model } from 'mongoose';
+import { CreateCommentDomainDto } from '../dto/create-comment.dto';
 
 export const commentContentConstraints = {
   minLength: 20,
@@ -30,15 +31,29 @@ export class Comment {
   static modelName = 'CommentModel';
   static collectionName = 'comments';
 
-  static createComment() {}
+  static createComment(dto: CreateCommentDomainDto) {
+    const comment = new this();
+
+    comment.postId = dto.postId;
+    comment.content = dto.content;
+    comment.blogId = dto.blogId;
+    comment.commentatorInfo.userId = dto.userId;
+    comment.commentatorInfo.userLogin = dto.login;
+    comment.createdAt = new Date();
+
+    comment.likesInfo.likesCount = 0;
+    comment.likesInfo.dislikesCount = 0;
+
+    return comment as CommentDocument;
+  }
 
   updateComment(content: string) {
     this.content = content;
   }
 
   updateLikeCount(likesCount: number, dislikesCount: number) {
-    this.likesInfo.likesCount = likesCount;
-    this.likesInfo.dislikesCount = dislikesCount;
+    this.likesInfo.likesCount = this.likesInfo.likesCount + likesCount;
+    this.likesInfo.dislikesCount = this.likesInfo.dislikesCount + dislikesCount;
   }
 }
 
