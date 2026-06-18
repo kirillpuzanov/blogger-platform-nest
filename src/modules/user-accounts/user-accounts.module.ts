@@ -17,6 +17,7 @@ import { RegistrationConfirmUseCase } from './users/usecases/registrationConfirm
 import { SetNewPassUseCase } from './users/usecases/setNewPass.case';
 import { RecoveryPassUseCase } from './users/usecases/recoveryPass.case';
 import { ResendConfirmCodeUseCase } from './users/usecases/resendConfirmCode.case';
+import { UsersExternalRepository } from './users/infra/users-external.repository';
 
 const useCases = [
   CreateUserUseCase,
@@ -39,7 +40,6 @@ const useCases = [
       },
     ]),
     JwtModule.register({}),
-
     NotificationsModule,
   ],
   controllers: [UsersController, AuthController],
@@ -47,10 +47,11 @@ const useCases = [
     ...useCases,
     UsersRepository,
     UsersQueryRepository,
+    UsersExternalRepository,
 
     CryptoService,
     JwtInternalService,
   ],
-  exports: [UsersRepository, JwtInternalService],
+  exports: [UsersExternalRepository, JwtInternalService],
 })
 export class UserAccountsModule {}

@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { LikeRepository } from './infra/like.repository';
-import { UsersRepository } from '../../user-accounts/users/infra/users.repository';
 import { LikeStatus } from '../../../core/dto/like-status';
 import { LikeCountUpdateDto } from './dto/like-count-update.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Like, type LikeModelType } from './domain/like.entity';
+import { UsersExternalRepository } from '../../user-accounts/users/infra/users-external.repository';
 
 @Injectable()
 export class LikeService {
   constructor(
     @InjectModel(Like.modelName)
     private LikeModel: LikeModelType,
-    private readonly usersRepository: UsersRepository, // todo external UsersRepository
+    private readonly usersExternalRepository: UsersExternalRepository,
     private readonly likeRepository: LikeRepository,
   ) {}
 
@@ -46,7 +46,7 @@ export class LikeService {
 
       /** если лайка нет - создадим */
       if (!existingLike) {
-        const user = await this.usersRepository.getById(userId);
+        const user = await this.usersExternalRepository.getById(userId);
         const newLike = this.LikeModel.createLike({
           parentId,
           userId,

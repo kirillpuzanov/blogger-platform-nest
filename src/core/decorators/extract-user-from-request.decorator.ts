@@ -5,6 +5,6 @@ export const ExtractUserFromRequest = createParamDecorator(
   (_, context: ExecutionContext) => {
     const request: Request = context.switchToHttp().getRequest();
 
-    return request.user;
+    return request.user ?? {};
   },
 );

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, type PostModelType } from '../domain/post.entity';
@@ -7,6 +7,10 @@ import { PaginatedViewDto } from '../../../../core/dto/base-paginated.view-dto';
 import { PostViewDto } from '../api/view-dto/post.view-dto';
 import { BlogsQueryRepository } from '../../blogs/infra/blogs.query.repository';
 import { LikeQueryRepository } from '../../likes/infra/like.query.repository';
+import {
+  DomainException,
+  DomainExceptionCode,
+} from '../../../../core/exceptions/domain.exception';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -53,7 +57,10 @@ export class PostsQueryRepository {
     const post = await this.PostModel.findOne({ _id: new ObjectId(id) });
 
     if (!post) {
-      throw new NotFoundException('post not found', 'id');
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'post not found',
+      });
     }
 
     const userLikes = await this.likeQueryRepository.getUserLikes(userId, [
@@ -73,7 +80,10 @@ export class PostsQueryRepository {
     const blog = await this.blogsQueryRepository.getByIdOrFail(blogId);
 
     if (!blog) {
-      throw new NotFoundException('blog does not exists', 'blogId');
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'blog does not exists',
+      });
     }
 
     const postsByBlog = await this.PostModel.find({ blogId })

@@ -9,6 +9,7 @@ import { BloggersPlatformModule } from '../modules/bloggers-platform/bloggers-pl
 import { APP_FILTER } from '@nestjs/core';
 import { DomainHttpExceptionsFilter } from '../core/exceptions/filters/domain-exceptions.filter';
 import { CqrsModule } from '@nestjs/cqrs';
+import { AllHttpExceptionsFilter } from '../core/exceptions/filters/all-exceptions.filter';
 
 @Module({
   imports: [
@@ -24,7 +25,11 @@ import { CqrsModule } from '@nestjs/cqrs';
   providers: [
     AppService,
 
-    /** Регистрируем глобальные перехватчики ошибок, перед отправкой ответа клиету */
+    /** Регистрируем глобальные перехватчики ошибок, перед отправкой ответа клиету, порядок важен? сначала Domain */
+    {
+      provide: APP_FILTER,
+      useClass: AllHttpExceptionsFilter,
+    },
     {
       provide: APP_FILTER,
       useClass: DomainHttpExceptionsFilter,
