@@ -1,25 +1,34 @@
-import { Module } from '@nestjs/common';
+import { configDynamicModule } from '../config/config-dynamic.module';
+
+import { DynamicModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserAccountsModule } from '../modules/user-accounts/user-accounts.module';
-import { settings } from '../setup/settings';
 import { TestingModule } from '../modules/testing/testing.module';
 import { BloggersPlatformModule } from '../modules/bloggers-platform/bloggers-platform.module';
 import { APP_FILTER } from '@nestjs/core';
 import { DomainHttpExceptionsFilter } from '../core/exceptions/filters/domain-exceptions.filter';
-import { CqrsModule } from '@nestjs/cqrs';
 import { AllHttpExceptionsFilter } from '../core/exceptions/filters/all-exceptions.filter';
+import { CoreConfig } from '../config/core.config';
+import { NotificationsModule } from '../modules/notifications/notifications.module';
+import { CoreModule } from '../core/core.module';
 
 @Module({
   imports: [
-    CqrsModule.forRoot(),
-    MongooseModule.forRoot(settings.MONGO_URL, {
-      dbName: settings.DB_NAME,
+    MongooseModule.forRootAsync({
+      useFactory: (coreConfig: CoreConfig) => ({
+        uri: coreConfig.mongoUrl,
+        dbName: coreConfig.dbName,
+      }),
+      inject: [CoreConfig],
     }),
     UserAccountsModule,
-    TestingModule,
     BloggersPlatformModule,
+
+    NotificationsModule,
+    CoreModule,
+    configDynamicModule,
   ],
   controllers: [AppController],
   providers: [
@@ -36,4 +45,11 @@ import { AllHttpExceptionsFilter } from '../core/exceptions/filters/all-exceptio
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  static forRoot(coreConfig: CoreConfig): DynamicModule {
+    return {
+      module: AppModule,
+      imports: [...(coreConfig.isIncludeTestingModule ? [TestingModule] : [])],
+    };
+  }
+}

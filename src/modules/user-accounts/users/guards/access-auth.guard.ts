@@ -5,11 +5,14 @@ import {
   DomainExceptionCode,
 } from '../../../../core/exceptions/domain.exception';
 import { JwtInternalService } from '../application/jwt.service';
-import { settings } from '../../../../setup/settings';
+import { CoreConfig } from '../../../../config/core.config';
 
 @Injectable()
 export class AccessAuthGuard implements CanActivate {
-  constructor(private jwtService: JwtInternalService) {}
+  constructor(
+    private jwtService: JwtInternalService,
+    private coreConfig: CoreConfig,
+  ) {}
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
@@ -25,7 +28,7 @@ export class AccessAuthGuard implements CanActivate {
     const token = authHeader.split(' ')[1];
     const { userId } = this.jwtService.verifyToken(
       token,
-      settings.JWT_SECRET_ACCESS,
+      this.coreConfig.jwtSecretAccess,
     );
 
     if (userId) {

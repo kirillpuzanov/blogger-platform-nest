@@ -1,15 +1,19 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app/app.module';
 import { appSetup } from './setup/app.setup';
+import { initAppModule } from './app/init-app-module';
+import { CoreConfig } from './config/core.config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const dynamicAppModule = await initAppModule();
+  const app = await NestFactory.create(dynamicAppModule);
+
+  const coreConfig = app.get<CoreConfig>(CoreConfig);
   // app.enableCors({
   //   credentials: true,
   // });  // todo ??
-  appSetup(app);
+  appSetup(app, coreConfig.isSwaggerEnabled);
 
-  await app.listen(process.env.PORT ?? 3001);
+  await app.listen(coreConfig.port ?? 3001);
 }
 
 bootstrap();
