@@ -5,10 +5,11 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { type Response } from 'express';
+import { type Request, type Response } from 'express';
 import { LoginInputDto } from './api/input-dto/login.input-dto';
 import { ApiBody } from '@nestjs/swagger';
 import { RegistrationInputDto } from './api/input-dto/registration.input-dto';
@@ -26,6 +27,12 @@ import { RegistrationConfirmCommand } from './usecases/registrationConfirm.case'
 import { ResendConfirmCodeCommand } from './usecases/resendConfirmCode.case';
 import { RecoveryPassCommand } from './usecases/recoveryPass.case';
 import { SetNewPassCommand } from './usecases/setNewPass.case';
+import { RefreshAuthGuard } from './guards/refresh-auth.guard';
+import {
+  RefreshTokenCommand,
+  RefreshTokenCommandReturn,
+} from './usecases/refreshToken.case';
+import { LogoutCommand } from './usecases/logout.case';
 
 @Controller('auth')
 export class AuthController {
@@ -118,5 +125,40 @@ export class AuthController {
         recoveryCode: body.recoveryCode,
       }),
     );
+  }
+
+  @Post('refresh-token')
+  @UseGuards(RefreshAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async refreshToken(@Req() req: Request, @Res() res: Response) {
+    const oldRefreshToken = req.cookies?.refreshToken as string;
+
+    const { accessToken, refreshToken } = await this.commandBus.execute<
+      RefreshTokenCommand,
+      RefreshTokenCommandReturn
+    >(new RefreshTokenCommand({ oldRefreshToken }));
+
+    return res
+      .cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: true,
+      })
+      .status(HttpStatus.OK)
+      .json({ accessToken: accessToken });
+  }
+
+  @Post('logout')
+  @UseGuards(RefreshAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async logout(@Req() req: Request, @Res() res: Response) {
+    const refreshToken = req.cookies?.refreshToken as string;
+
+    await this.commandBus.execute<LogoutCommand, void>(
+      new LogoutCommand({ refreshToken }),
+    );
+
+    return res
+      .clearCookie('refreshToken', { path: '/' })
+      .status(HttpStatus.NO_CONTENT);
   }
 }
