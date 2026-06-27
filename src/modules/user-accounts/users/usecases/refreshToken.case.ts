@@ -5,6 +5,7 @@ import {
   DomainException,
   DomainExceptionCode,
 } from '../../../../core/exceptions/domain.exception';
+import { SessionsRepository } from '../infra/sessions.repository';
 
 export type RefreshTokenCommandReturn = {
   accessToken: string;
@@ -29,6 +30,16 @@ export class RefreshTokenUseCase implements ICommandHandler<RefreshTokenCommand>
     const { oldRefreshToken } = dto;
 
     const { userId, deviceId } = this.jwtService.decodeToken(oldRefreshToken);
+
+    const session = await this.sessionsRepository.getSession(deviceId);
+
+    if (!session) {
+      throw new DomainException({
+        code: DomainExceptionCode.Unauthorized,
+        message: 'Unauthorized',
+      });
+    }
+
     /** создаем новую пару токенов */
     const { accessToken, refreshToken } = this.jwtService.createTokens(
       userId,
@@ -39,20 +50,10 @@ export class RefreshTokenUseCase implements ICommandHandler<RefreshTokenCommand>
     const { iat, exp } = this.jwtService.decodeToken(refreshToken);
 
     /** обновляем данные жизни текущей сессии */
-    const updatedCount = await this.sessionsRepository.updateSession(
-      userId,
-      deviceId,
-      iat,
-      exp,
-    );
+    session.updateSession({ userId, deviceId, iat, exp });
 
-    if (updatedCount > 0) {
-      return { accessToken, refreshToken };
-    } else {
-      throw new DomainException({
-        code: DomainExceptionCode.Unauthorized,
-        message: 'Unauthorized',
-      });
-    }
+    await this.sessionsRepository.save(session);
+
+    return { accessToken, refreshToken };
   }
 }

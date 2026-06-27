@@ -6,6 +6,7 @@ import {
   DomainException,
   DomainExceptionCode,
 } from '../../../../core/exceptions/domain.exception';
+import { SessionsRepository } from '../infra/sessions.repository';
 
 interface RequestWithCookies extends Request {
   cookies: {

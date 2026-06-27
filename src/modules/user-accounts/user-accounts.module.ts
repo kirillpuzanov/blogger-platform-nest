@@ -18,6 +18,12 @@ import { SetNewPassUseCase } from './users/usecases/setNewPass.case';
 import { RecoveryPassUseCase } from './users/usecases/recoveryPass.case';
 import { ResendConfirmCodeUseCase } from './users/usecases/resendConfirmCode.case';
 import { UsersExternalRepository } from './users/infra/users-external.repository';
+import { DeleteUserSessionUseCase } from './users/usecases/sessions/delete-user-session.case';
+import { DeleteUserSessionsUseCase } from './users/usecases/sessions/delete-user-sessions.case';
+import { Session, SessionSchema } from './users/domain/session.entity';
+import { SessionsController } from './users/sessions.controller';
+import { SessionsQueryRepository } from './users/infra/sessions.query-repository';
+import { SessionsRepository } from './users/infra/sessions.repository';
 
 const useCases = [
   CreateUserUseCase,
@@ -28,6 +34,9 @@ const useCases = [
   SetNewPassUseCase,
   RecoveryPassUseCase,
   ResendConfirmCodeUseCase,
+
+  DeleteUserSessionUseCase,
+  DeleteUserSessionsUseCase,
 ];
 
 @Module({
@@ -39,19 +48,29 @@ const useCases = [
         collection: User.collectionName,
       },
     ]),
+    MongooseModule.forFeature([
+      {
+        name: Session.modelName,
+        schema: SessionSchema,
+        collection: Session.collectionName,
+      },
+    ]),
     JwtModule.register({}),
     NotificationsModule,
   ],
-  controllers: [UsersController, AuthController],
+  controllers: [UsersController, AuthController, SessionsController],
   providers: [
     ...useCases,
     UsersRepository,
     UsersQueryRepository,
     UsersExternalRepository,
 
+    SessionsRepository,
+    SessionsQueryRepository,
+
     CryptoService,
     JwtInternalService,
   ],
-  exports: [UsersExternalRepository, JwtInternalService],
+  exports: [UsersExternalRepository, JwtInternalService], //todo Session repo
 })
 export class UserAccountsModule {}
