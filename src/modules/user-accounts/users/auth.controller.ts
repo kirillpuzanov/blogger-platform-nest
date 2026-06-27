@@ -53,7 +53,15 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiBody({ type: LoginInputDto })
-  async login(@Body() body: LoginInputDto, @Res() res: Response) {
+  async login(
+    @Body() body: LoginInputDto,
+    @Res() res: Response,
+    @Req() req: Request,
+  ) {
+    const ip = req.ip ?? '';
+    const ua = req.useragent;
+    const deviceName = `${ua?.browser ?? 'unknown'} ${ua?.version ?? 'unknown'}`;
+
     const tokens = await this.commandBus.execute<
       LoginCommand,
       LoginCommandReturn
@@ -61,8 +69,8 @@ export class AuthController {
       new LoginCommand({
         password: body.password,
         loginOrEmail: body.loginOrEmail,
-        deviceName: 'test-deviceName',
-        ip: 'test-ip',
+        deviceName,
+        ip,
       }),
     );
 

@@ -46,6 +46,9 @@ export class CoreConfig {
   @IsNotEmpty({ message: 'Set Env variable emailPass' })
   emailPass: string;
 
+  @IsBoolean({ message: 'Set Env variable sendInternalServerErrorDetails' })
+  sendInternalServerErrorDetails: boolean;
+
   @IsEnum(Environments, {
     message:
       'Set Env variable NODE_ENV, available values: ' +
@@ -74,6 +77,9 @@ export class CoreConfig {
     this.email = this.configService.get('EMAIL');
     this.emailPass = this.configService.get('EMAIL_PASS');
     this.env = this.configService.get('NODE_ENV');
+    this.sendInternalServerErrorDetails = configValidation.convertToBoolean(
+      this.configService.get('SEND_INTERNAL_SERVER_ERROR_DETAILS'),
+    );
 
     this.accessExpireIn = this.configService.get('ACCESS_TOKEN_EXPIRE_IN');
     this.refreshExpireIn = this.configService.get('REFRESH_TOKEN_EXPIRE_IN');

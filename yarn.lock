@@ -1389,7 +1389,14 @@
     "@types/range-parser" "*"
     "@types/send" "*"
 
-"@types/express@^5.0.0":
+"@types/express-useragent@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@types/express-useragent/-/express-useragent-1.0.5.tgz#d4c210fdab8050459c087f36666dcc513fa5834b"
+  integrity sha512-G1zPW6jDj7oGJvMvB8UCIAWznCOafcksYzOg8LINfYmvrXlSGJ6nsJ7O7GlmYMjrgGYvobYaI8IhRCkAKslPJA==
+  dependencies:
+    "@types/express" "*"
+
+"@types/express@*", "@types/express@^5.0.0":
   version "5.0.6"
   resolved "https://registry.yarnpkg.com/@types/express/-/express-5.0.6.tgz#2d724b2c990dcb8c8444063f3580a903f6d500cc"
   integrity sha512-sKYVuV7Sv9fbPIt/442koC7+IIwK5olP1KWeD88e/idgoJqDm3JV/YUiPwkoKK92ylff2MGxSz1CSjsXelx0YA==
@@ -3378,6 +3385,11 @@ expect@30.4.1, expect@^30.0.0:
     jest-message-util "30.4.1"
     jest-mock "30.4.1"
     jest-util "30.4.1"
+
+express-useragent@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/express-useragent/-/express-useragent-2.2.0.tgz#8e59877fcca4e66d60ce70d3d34cc7a166ac6fa4"
+  integrity sha512-P67xFbgKVbVY1nOrMBLUNCxh72fnxAclIJ03HTw72AsVHqF4NXgWZrRREKQJz0eFrWLc1e2Yn2m1OblYxAqAGQ==
 
 express@5.2.1:
   version "5.2.1"

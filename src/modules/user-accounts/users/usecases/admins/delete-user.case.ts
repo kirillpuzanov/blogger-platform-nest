@@ -6,6 +6,7 @@ import {
   DomainException,
   DomainExceptionCode,
 } from '../../../../../core/exceptions/domain.exception';
+import { SessionsRepository } from '../../infra/sessions.repository';
 
 export class DeleteUserCommand {
   constructor(public id: string) {}
@@ -16,6 +17,7 @@ export class DeleteUserUseCase implements ICommandHandler<DeleteUserCommand> {
   constructor(
     @InjectModel(User.modelName)
     private usersRepository: UsersRepository,
+    private sessionsRepository: SessionsRepository,
   ) {}
 
   async execute({ id }: DeleteUserCommand): Promise<void> {
@@ -27,7 +29,6 @@ export class DeleteUserUseCase implements ICommandHandler<DeleteUserCommand> {
         message: 'user is not exists',
       });
     }
-    // todo
-    // await this.sessionsRepository.deleteAllUserSessions(id);
+    await this.sessionsRepository.deleteAllUserSessions(id);
   }
 }

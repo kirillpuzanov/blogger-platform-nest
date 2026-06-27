@@ -9,6 +9,13 @@ import { CryptoService } from '../application/crypto.service';
 import { JwtInternalService } from '../application/jwt.service';
 import { randomUUID } from 'crypto';
 import { LoginDomainDto } from '../domain/dto/login.domain.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import {
+  Session,
+  SessionDocument,
+  type SessionModelType,
+} from '../domain/session.entity';
+import { SessionsRepository } from '../infra/sessions.repository';
 
 export type LoginCommandReturn = { accessToken: string; refreshToken: string };
 
@@ -19,13 +26,17 @@ export class LoginCommand {
 @CommandHandler(LoginCommand)
 export class LoginUseCase implements ICommandHandler<LoginCommand> {
   constructor(
+    @InjectModel(Session.modelName)
+    private SessionModel: SessionModelType,
     private usersRepository: UsersRepository,
+    private sessionsRepository: SessionsRepository,
     private cryptoService: CryptoService,
     private jwtService: JwtInternalService,
   ) {}
 
   async execute({ dto }: LoginCommand): Promise<LoginCommandReturn> {
-    const { password, loginOrEmail } = dto;
+    const { password, loginOrEmail, ip, deviceName } = dto;
+
     /** находим пользователя по логину или емаил, проверяем валидность пароля */
     const user = await this.checkCredentials(password, loginOrEmail);
 
@@ -38,10 +49,19 @@ export class LoginUseCase implements ICommandHandler<LoginCommand> {
       deviceId,
     );
 
-    return { accessToken, refreshToken };
+    const { exp, iat } = this.jwtService.decodeToken(refreshToken);
+    const session: SessionDocument = this.SessionModel.createSession({
+      ip,
+      exp,
+      iat,
+      userId,
+      deviceId,
+      deviceName,
+    });
 
-    // todo - создаем сессию для этого утстройства
-    // ...
+    await this.sessionsRepository.save(session);
+
+    return { accessToken, refreshToken };
   }
 
   private async checkCredentials(

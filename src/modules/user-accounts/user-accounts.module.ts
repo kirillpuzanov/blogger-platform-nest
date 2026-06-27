@@ -71,6 +71,6 @@ const useCases = [
     CryptoService,
     JwtInternalService,
   ],
-  exports: [UsersExternalRepository, JwtInternalService], //todo Session repo
+  exports: [UsersExternalRepository, JwtInternalService],
 })
 export class UserAccountsModule {}
