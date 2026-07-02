@@ -5,10 +5,6 @@ import {
   SessionDocument,
   type SessionModelType,
 } from '../domain/session.entity';
-import {
-  DomainException,
-  DomainExceptionCode,
-} from '../../../../core/exceptions/domain.exception';
 
 @Injectable()
 export class SessionsRepository {
@@ -16,17 +12,8 @@ export class SessionsRepository {
     @InjectModel(Session.modelName) private SessionModel: SessionModelType,
   ) {}
 
-  async getSession(deviceId: string): Promise<SessionDocument> {
-    const session = await this.SessionModel.findOne({ deviceId });
-
-    if (!session) {
-      throw new DomainException({
-        code: DomainExceptionCode.NotFound,
-        message: 'session not found',
-      });
-    }
-
-    return session;
+  async getSession(deviceId: string): Promise<SessionDocument | null> {
+    return this.SessionModel.findOne({ deviceId });
   }
 
   async deleteOtherMySessions(userId: string, deviceId: string): Promise<void> {

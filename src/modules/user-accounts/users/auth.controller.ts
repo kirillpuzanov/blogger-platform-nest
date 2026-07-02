@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { type Request, type Response } from 'express';
 import { LoginInputDto } from './api/input-dto/login.input-dto';
-import { ApiBody } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiCookieAuth } from '@nestjs/swagger';
 import { RegistrationInputDto } from './api/input-dto/registration.input-dto';
 import { RegistrationConfirmInputDto } from './api/input-dto/registration-confirm.input-dto';
 import { RegistrationResendCodeInputDto } from './api/input-dto/registration-resend-code.input-dto';
@@ -33,6 +33,7 @@ import {
   RefreshTokenCommandReturn,
 } from './usecases/refreshToken.case';
 import { LogoutCommand } from './usecases/logout.case';
+import { IpRestrictionGuard } from '../../../core/guards/ip-restriction.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -43,6 +44,7 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(AccessAuthGuard)
+  @ApiBearerAuth('access_token')
   async me(@ExtractUserFromRequest() user: { id: string }) {
     const me = await this.usersQueryRepository.getByIdOrFail(user.id);
     const { id, login, email } = me;
@@ -51,6 +53,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @UseGuards(IpRestrictionGuard)
   @HttpCode(HttpStatus.OK)
   @ApiBody({ type: LoginInputDto })
   async login(
@@ -84,6 +87,7 @@ export class AuthController {
   }
 
   @Post('registration')
+  @UseGuards(IpRestrictionGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBody({ type: RegistrationInputDto })
   async registration(@Body() body: RegistrationInputDto) {
@@ -97,7 +101,7 @@ export class AuthController {
   }
 
   @Post('registration-confirmation')
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(IpRestrictionGuard)
   @ApiBody({ type: RegistrationConfirmInputDto })
   async registrationConfirm(@Body() body: RegistrationConfirmInputDto) {
     return await this.commandBus.execute<RegistrationConfirmCommand, void>(
@@ -106,6 +110,7 @@ export class AuthController {
   }
 
   @Post('registration-email-resending')
+  @UseGuards(IpRestrictionGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBody({ type: RegistrationResendCodeInputDto })
   async resendConfirmCode(@Body() body: RegistrationResendCodeInputDto) {
@@ -115,6 +120,7 @@ export class AuthController {
   }
 
   @Post('password-recovery')
+  @UseGuards(IpRestrictionGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBody({ type: RegistrationResendCodeInputDto })
   async recoveryPass(@Body() body: RegistrationResendCodeInputDto) {
@@ -124,6 +130,7 @@ export class AuthController {
   }
 
   @Post('new-password')
+  @UseGuards(IpRestrictionGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBody({ type: NewPasswordInputDto })
   async setNewPassword(@Body() body: NewPasswordInputDto) {
@@ -137,6 +144,7 @@ export class AuthController {
 
   @Post('refresh-token')
   @UseGuards(RefreshAuthGuard)
+  @ApiCookieAuth('refresh_token')
   @HttpCode(HttpStatus.OK)
   async refreshToken(@Req() req: Request, @Res() res: Response) {
     const oldRefreshToken = req.cookies?.refreshToken as string;
@@ -157,6 +165,7 @@ export class AuthController {
 
   @Post('logout')
   @UseGuards(RefreshAuthGuard)
+  @ApiCookieAuth('refresh_token')
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Req() req: Request, @Res() res: Response) {
     const refreshToken = req.cookies?.refreshToken as string;
@@ -167,6 +176,6 @@ export class AuthController {
 
     return res
       .clearCookie('refreshToken', { path: '/' })
-      .status(HttpStatus.NO_CONTENT);
+      .sendStatus(HttpStatus.NO_CONTENT);
   }
 }

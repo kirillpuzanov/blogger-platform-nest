@@ -62,10 +62,10 @@ export class PostsController {
     return this.postsQueryRepository.getByIdOrFail(postId, user?.id);
   }
 
-  @ApiBasicAuth()
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(BasicAuthGuard)
+  @ApiBasicAuth('basic_auth')
   async createPost(@Body() body: CreatePostInputDto): Promise<PostViewDto> {
     const postId = await this.commandBus.execute<CreatePostCommand, string>(
       new CreatePostCommand(body),
@@ -73,10 +73,10 @@ export class PostsController {
     return this.postsQueryRepository.getByIdOrFail(postId, undefined);
   }
 
-  @ApiBasicAuth()
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BasicAuthGuard)
+  @ApiBasicAuth('basic_auth')
   async updatePost(
     @Param('id', ObjectIdValidationPipe) id: string,
     @Body() body: CreatePostInputDto,
@@ -86,10 +86,10 @@ export class PostsController {
     );
   }
 
-  @ApiBasicAuth()
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BasicAuthGuard)
+  @ApiBasicAuth('basic_auth')
   async deletePost(@Param('id', ObjectIdValidationPipe) id: string) {
     return this.commandBus.execute<DeletePostCommand, void>(
       new DeletePostCommand(id),
@@ -103,7 +103,7 @@ export class PostsController {
     @Query() query: GetCommentsQueryInputDto,
     @Param('postId') postId: string,
     @ExtractUserFromRequest() user: { id: string },
-  ) {
+  ): Promise<PaginatedViewDto<CommentViewDto[]>> {
     return this.commentsQueryRepository.getCommentsByPost(
       postId,
       query,
@@ -111,10 +111,10 @@ export class PostsController {
     );
   }
 
-  @ApiBearerAuth()
   @Post(':postId/comments')
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(AccessAuthGuard)
+  @ApiBearerAuth('access_token')
   async createCommentByPost(
     @Param('postId') postId: string,
     @Body() body: CreateCommentByPostInputDto,
@@ -133,10 +133,10 @@ export class PostsController {
     return this.commentsQueryRepository.getById(commentId, user.id);
   }
 
-  @ApiBearerAuth()
   @Put(':postId/like-status')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AccessAuthGuard)
+  @ApiBearerAuth('access_token')
   async updateLikeStatus(
     @Param('postId') postId: string,
     @Body() body: UpdatePostLikeInputDto,

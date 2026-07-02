@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { RefreshAuthGuard } from './guards/refresh-auth.guard';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiCookieAuth } from '@nestjs/swagger';
 import { ExtractUserFromRequest } from '../../../core/decorators/extract-user-from-request.decorator';
 import type { Request } from 'express';
 import { CommandBus } from '@nestjs/cqrs';
@@ -19,7 +19,7 @@ import { SessionsQueryRepository } from './infra/sessions.query-repository';
 
 @Controller('security')
 @UseGuards(RefreshAuthGuard)
-@ApiBearerAuth()
+@ApiCookieAuth('refresh_token')
 export class SessionsController {
   constructor(
     private readonly commandBus: CommandBus,

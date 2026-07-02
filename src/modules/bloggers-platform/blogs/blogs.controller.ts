@@ -56,10 +56,10 @@ export class BlogsController {
     return this.blogsQueryRepository.getByIdOrFail(id);
   }
 
-  @ApiBasicAuth()
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(BasicAuthGuard)
+  @ApiBasicAuth('basic_auth')
   async createBlog(@Body() body: CreateBlogInputDto): Promise<BlogViewDto> {
     const blogId = await this.commandBus.execute<CreateBlogCommand, string>(
       new CreateBlogCommand(body),
@@ -67,10 +67,10 @@ export class BlogsController {
     return this.blogsQueryRepository.getByIdOrFail(blogId);
   }
 
-  @ApiBasicAuth()
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BasicAuthGuard)
+  @ApiBasicAuth('basic_auth')
   async updateBlog(
     @Param('id', ObjectIdValidationPipe) id: string,
     @Body() body: CreateBlogInputDto,
@@ -80,10 +80,10 @@ export class BlogsController {
     );
   }
 
-  @ApiBasicAuth()
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BasicAuthGuard)
+  @ApiBasicAuth('basic_auth')
   async deleteBlog(@Param('id', ObjectIdValidationPipe) id: string) {
     return this.commandBus.execute<DeleteBlogCommand, void>(
       new DeleteBlogCommand(id),
@@ -101,10 +101,10 @@ export class BlogsController {
     return this.postsQueryRepository.getPostsByBlog(blogId, query, user?.id);
   }
 
-  @ApiBasicAuth()
   @Post('/:blogId/posts')
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(BasicAuthGuard)
+  @ApiBasicAuth('basic_auth')
   async createPostByBlog(
     @Param('blogId', ObjectIdValidationPipe) blogId: string,
     @Body() body: CreatePostByBlogInputDto,

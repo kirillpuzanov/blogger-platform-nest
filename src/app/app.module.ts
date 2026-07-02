@@ -13,6 +13,8 @@ import { AllHttpExceptionsFilter } from '../core/exceptions/filters/all-exceptio
 import { CoreConfig } from '../config/core.config';
 import { NotificationsModule } from '../modules/notifications/notifications.module';
 import { CoreModule } from '../core/core.module';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerExceptionsFilter } from '../core/exceptions/filters/throttler-exceptions.filter';
 
 @Module({
   imports: [
@@ -23,6 +25,12 @@ import { CoreModule } from '../core/core.module';
       }),
       inject: [CoreConfig],
     }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 10_000, // Время жизни записи - 10 сек
+        limit: 5, // Максимальное количество запросов за период
+      },
+    ]),
     UserAccountsModule,
     BloggersPlatformModule,
 
@@ -38,6 +46,10 @@ import { CoreModule } from '../core/core.module';
     {
       provide: APP_FILTER,
       useClass: AllHttpExceptionsFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: ThrottlerExceptionsFilter,
     },
     {
       provide: APP_FILTER,

@@ -1,6 +1,4 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { InjectModel } from '@nestjs/mongoose';
-import { User } from '../domain/user.entity';
 import {
   DomainException,
   DomainExceptionCode,
@@ -16,7 +14,6 @@ export class ResendConfirmCodeCommand {
 @CommandHandler(ResendConfirmCodeCommand)
 export class ResendConfirmCodeUseCase implements ICommandHandler<ResendConfirmCodeCommand> {
   constructor(
-    @InjectModel(User.modelName)
     private usersRepository: UsersRepository,
     private emailService: EmailService,
   ) {}

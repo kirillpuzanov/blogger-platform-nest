@@ -3,9 +3,12 @@ import { HydratedDocument, Model } from 'mongoose';
 import { CreateSessionDomainDto } from './dto/create-session.domain.dto';
 import { UpdateSessionDomainDto } from './dto/update-session.domain.dto';
 
-@Schema({ timestamps: true })
+@Schema({
+  timestamps: true,
+  collection: 'authDeviceSessions',
+})
 export class Session {
-  @Prop({ type: String, required: true, unique: true })
+  @Prop({ type: String, required: true })
   userId: string;
 
   @Prop({ type: String, required: true, unique: true })
