@@ -28,6 +28,15 @@ export class CoreConfig {
   @IsNotEmpty({ message: 'Set Env variable DB_NAME' })
   dbName: string;
 
+  @IsNumber({}, { message: 'Set Env variable SQL_PORT, example: 3000' })
+  sqlPort: number;
+
+  @IsNotEmpty({ message: 'Set Env variable SQL_USER_NAME' })
+  sqlUserName: string;
+
+  @IsNotEmpty({ message: 'Set Env variable SQL_DB_NAME' })
+  sqlDbName: string;
+
   @IsBoolean({ message: 'Set Env variable IS_SWAGGER_ENABLED' })
   isSwaggerEnabled: boolean;
 
@@ -84,6 +93,9 @@ export class CoreConfig {
     this.accessExpireIn = this.configService.get('ACCESS_TOKEN_EXPIRE_IN');
     this.refreshExpireIn = this.configService.get('REFRESH_TOKEN_EXPIRE_IN');
 
+    this.sqlPort = Number(this.configService.get('SQL_PORT'));
+    this.sqlUserName = this.configService.get('SQL_USER_NAME');
+    this.sqlDbName = this.configService.get('SQL_DB_NAME');
     configValidation.validateConfig(this);
   }
 }

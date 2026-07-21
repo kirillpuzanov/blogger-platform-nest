@@ -26,6 +26,7 @@ import { SessionsQueryRepository } from './users/infra/sessions.query-repository
 import { SessionsRepository } from './users/infra/sessions.repository';
 import { LogoutUseCase } from './users/usecases/logout.case';
 import { RefreshTokenUseCase } from './users/usecases/refreshToken.case';
+import { UsersSqlQueryRepository } from './users/infra/users.sql.query-repository';
 
 const useCases = [
   CreateUserUseCase,
@@ -69,6 +70,8 @@ const useCases = [
     UsersRepository,
     UsersQueryRepository,
     UsersExternalRepository,
+
+    UsersSqlQueryRepository,
 
     SessionsRepository,
     SessionsQueryRepository,
