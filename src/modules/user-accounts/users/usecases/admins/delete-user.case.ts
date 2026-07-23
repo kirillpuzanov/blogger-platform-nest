@@ -1,7 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../infra/users.repository';
-import { InjectModel } from '@nestjs/mongoose';
-import { User } from '../../domain/user.entity';
 import {
   DomainException,
   DomainExceptionCode,
@@ -15,7 +13,6 @@ export class DeleteUserCommand {
 @CommandHandler(DeleteUserCommand)
 export class DeleteUserUseCase implements ICommandHandler<DeleteUserCommand> {
   constructor(
-    @InjectModel(User.modelName)
     private usersRepository: UsersRepository,
     private sessionsRepository: SessionsRepository,
   ) {}
@@ -29,6 +26,7 @@ export class DeleteUserUseCase implements ICommandHandler<DeleteUserCommand> {
         message: 'user is not exists',
       });
     }
-    await this.sessionsRepository.deleteAllUserSessions(id);
+    // todo - переделать deleteAllUserSessions
+    // await this.sessionsRepository.deleteAllUserSessions(id);
   }
 }

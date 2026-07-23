@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongodb';
 import { Injectable } from '@nestjs/common';
 import { User, UserDocument, type UserModelType } from '../domain/user.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -38,8 +37,14 @@ export class UsersRepository {
   }
 
   async deleteOne(id: string): Promise<number> {
-    const res = await this.UserModel.deleteOne({ _id: new ObjectId(id) });
-    return res.deletedCount;
+    const result = await this.dataSource.query<number[]>(
+      `
+        DELETE FROM users
+        WHERE id = $1`,
+      [id],
+    );
+
+    return result[1];
   }
 
   async checkUniqueEmailOrLogin(loginOrEmail: string): Promise<boolean> {
