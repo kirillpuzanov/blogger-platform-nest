@@ -1,7 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import type { UserModelType } from '../domain/user.entity';
-import { User } from '../domain/user.entity';
 import { UserViewDto } from '../api/view-dto/user.view-dto';
 import {
   GetUsersQueryInputDto,
@@ -18,10 +15,7 @@ import { UserSqlDto } from '../domain/sql-entity-dto/user.sql-dto';
 
 @Injectable()
 export class UsersSqlQueryRepository {
-  constructor(
-    @InjectModel(User.modelName) private UserModel: UserModelType,
-    @InjectDataSource() protected dataSource: DataSource,
-  ) {}
+  constructor(@InjectDataSource() protected dataSource: DataSource) {}
 
   async getAll(
     query: GetUsersQueryInputDto,
@@ -111,3 +105,17 @@ export class UsersSqlQueryRepository {
     return UserViewDto.mapToViewSql(user);
   }
 }
+
+// - как при создании например юзера заполнять разные зависимые таблицы
+
+// WITH new_user AS (
+//   INSERT INTO users (name, email)
+// VALUES ('John Doe', 'john@mail.com')
+// RETURNING id
+// )
+// INSERT INTO posts (title, content, user_id)
+// SELECT 'First Post', 'Content...', id
+// FROM new_user
+// UNION ALL
+// SELECT 'Second Post', 'Content...', id
+// FROM new_user;
