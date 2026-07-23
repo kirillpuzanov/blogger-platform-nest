@@ -19,16 +19,15 @@ import { ApiBasicAuth, ApiBody } from '@nestjs/swagger';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from './usecases/admins/create-user.case';
 import { DeleteUserCommand } from './usecases/admins/delete-user.case';
-import { UsersSqlQueryRepository } from './infra/users.sql.query-repository';
 import { PaginatedViewDto } from '../../../core/dto/base-paginated.view-dto';
+import { UsersQueryRepository } from './infra/users.query-repository';
 
 @Controller('users')
 @UseGuards(BasicAuthGuard)
 @ApiBasicAuth('basic_auth')
 export class UsersController {
   constructor(
-    private usersQueryRepository: UsersSqlQueryRepository,
-    // private usersQueryRepository: UsersQueryRepository, // todo заменил на sqlRepo
+    private usersQueryRepository: UsersQueryRepository,
     private readonly commandBus: CommandBus,
   ) {}
 
