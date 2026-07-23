@@ -22,7 +22,7 @@ import { DeleteUserCommand } from './usecases/admins/delete-user.case';
 import { PaginatedViewDto } from '../../../core/dto/base-paginated.view-dto';
 import { UsersQueryRepository } from './infra/users.query-repository';
 
-@Controller('users')
+@Controller('sa/users')
 @UseGuards(BasicAuthGuard)
 @ApiBasicAuth('basic_auth')
 export class UsersController {

@@ -5,6 +5,7 @@ import { CreateUserDomainDto } from '../dto/create-user.dto';
 import { EmailConfirmation } from './email-confirmation.schema';
 import { RecoveryPassData } from './recovery-pass.schema';
 import { UserSqlDto } from './sql-entity-dto/user.sql-dto';
+import { ConfirmationDataDomainDto } from './dto/confirmation-data.domain.dto';
 
 export const loginConstraints = {
   minLength: 3,
@@ -44,8 +45,11 @@ export class UserSql implements UserSqlDto {
   ): UserSqlDto {
     const user = new this();
 
-    const { confirmationCode, expirationDate, sentDate } =
-      this.getNewConfirmationData();
+    const {
+      confirmation_code,
+      confirmation_sent_date,
+      confirmation_expiration,
+    } = this.getNewConfirmationData();
 
     user.login = dto.login;
     user.email = dto.email;
@@ -55,19 +59,19 @@ export class UserSql implements UserSqlDto {
     user.is_confirmed = Boolean(isConfirmed);
 
     if (!isConfirmed) {
-      user.confirmation_code = confirmationCode;
-      user.confirmation_expiration = expirationDate;
-      user.confirmation_sent_date = sentDate;
+      user.confirmation_code = confirmation_code;
+      user.confirmation_sent_date = confirmation_sent_date;
+      user.confirmation_expiration = confirmation_expiration;
     }
 
     return user;
   }
 
-  static getNewConfirmationData() {
+  static getNewConfirmationData(): ConfirmationDataDomainDto {
     return {
-      confirmationCode: randomUUID(),
-      sentDate: new Date(),
-      expirationDate: new Date(
+      confirmation_code: randomUUID(),
+      confirmation_sent_date: new Date(),
+      confirmation_expiration: new Date(
         new Date().getTime() + 20 * 60 * 1000, // 20 min,
       ),
     };

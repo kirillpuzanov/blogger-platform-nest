@@ -4,6 +4,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserSqlDto } from '../domain/sql-entity-dto/user.sql-dto';
+import { ConfirmationDataDomainDto } from '../domain/dto/confirmation-data.domain.dto';
 
 @Injectable()
 export class UsersRepository {
@@ -58,10 +59,39 @@ export class UsersRepository {
     return Number(result[0].count) > 0;
   }
 
-  async getByLoginOrEmail(loginOrEmail: string): Promise<UserDocument | null> {
-    return this.UserModel.findOne({
-      $or: [{ login: loginOrEmail }, { email: loginOrEmail }],
-    });
+  async getByLoginOrEmail(loginOrEmail: string): Promise<UserSqlDto | null> {
+    const result = await this.dataSource.query<UserSqlDto[]>(
+      `
+        SELECT *  FROM users
+        WHERE login = $1 or email = $1
+        LIMIT 1`,
+      [loginOrEmail],
+    );
+
+    if (result.length === 0) {
+      return null;
+    }
+
+    return result[0];
+  }
+
+  async updateConfirmationData(
+    id: string,
+    confirmationData: ConfirmationDataDomainDto,
+  ): Promise<void> {
+    return this.dataSource.query<void>(
+      `
+        UPDATE users
+        SET confirmation_code=$1, confirmation_sent_date=$2,confirmation_expiration=$3
+        WHERE id = $4
+        `,
+      [
+        confirmationData.confirmation_code,
+        confirmationData.confirmation_sent_date,
+        confirmationData.confirmation_expiration,
+        id,
+      ],
+    );
   }
 
   async getByConfirmCode(confirmCode: string): Promise<UserDocument | null> {
