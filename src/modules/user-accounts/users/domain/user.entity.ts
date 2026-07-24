@@ -132,23 +132,6 @@ export class User {
       ),
     };
   }
-
-  updateIsConfirm() {
-    this.emailConfirmation.isConfirmed = true;
-  }
-
-  updateConfirmationData() {
-    const { confirmationCode, expirationDate, sentDate } =
-      this.getNewConfirmationData();
-
-    this.emailConfirmation.confirmationCode = confirmationCode;
-    this.emailConfirmation.sentDate = sentDate;
-    this.emailConfirmation.expirationDate = expirationDate;
-  }
-
-  updatePasswordHash(newPasswordHash: string) {
-    this.passwordHash = newPasswordHash;
-  }
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

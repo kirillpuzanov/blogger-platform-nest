@@ -15,8 +15,6 @@ export class GetUsersQueryInputDto extends BaseQueryParams {
   searchEmailTerm: string | null = null;
 }
 
-// todo temp
-
 export const sortByUsersQueryAdapter = {
   createdAt: 'created_at',
   login: 'login',

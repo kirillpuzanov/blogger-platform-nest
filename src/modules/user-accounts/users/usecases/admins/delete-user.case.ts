@@ -26,7 +26,27 @@ export class DeleteUserUseCase implements ICommandHandler<DeleteUserCommand> {
         message: 'user is not exists',
       });
     }
-    // todo - переделать deleteAllUserSessions
-    // await this.sessionsRepository.deleteAllUserSessions(id);
+    await this.sessionsRepository.deleteAllUserSessions(id);
   }
 }
+
+// Mongoose
+// @CommandHandler(DeleteUserCommand)
+// export class DeleteUserUseCase implements ICommandHandler<DeleteUserCommand> {
+//   constructor(
+//     private usersRepository: UsersRepository,
+//     private sessionsRepository: SessionsRepository,
+//   ) {}
+//
+//   async execute({ id }: DeleteUserCommand): Promise<void> {
+//     const deletedCount = await this.usersRepository.deleteOne(id);
+//
+//     if (deletedCount < 1) {
+//       throw new DomainException({
+//         code: DomainExceptionCode.NotFound,
+//         message: 'user is not exists',
+//       });
+//     }
+//     await this.sessionsRepository.deleteAllUserSessions(id);
+//   }
+// }

@@ -2,6 +2,31 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreateSessionDomainDto } from './dto/create-session.domain.dto';
 import { UpdateSessionDomainDto } from './dto/update-session.domain.dto';
+import { SessionSqlDto } from './sql-entity-dto/session.sql-dto';
+
+export class SessionSql implements SessionSqlDto {
+  id: string;
+  user_id: string;
+  device_id: string;
+  device_name: string;
+  ip: string;
+  iat: number;
+  exp: number;
+
+  static createSession(dto: CreateSessionDomainDto): SessionSqlDto {
+    const session = new this();
+
+    session.user_id = dto.userId;
+    session.device_id = dto.deviceId;
+    session.device_name = dto.deviceName;
+
+    session.ip = dto.ip;
+    session.iat = dto.iat;
+    session.exp = dto.exp;
+
+    return session;
+  }
+}
 
 @Schema({
   timestamps: true,

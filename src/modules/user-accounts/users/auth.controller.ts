@@ -34,8 +34,7 @@ import {
 } from './usecases/refreshToken.case';
 import { LogoutCommand } from './usecases/logout.case';
 
-//todo
-// import { IpRestrictionGuard } from '../../../core/guards/ip-restriction.guard';
+import { IpRestrictionGuard } from '../../../core/guards/ip-restriction.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -55,7 +54,7 @@ export class AuthController {
   }
 
   @Post('login')
-  // @UseGuards(IpRestrictionGuard)
+  @UseGuards(IpRestrictionGuard)
   @HttpCode(HttpStatus.OK)
   @ApiBody({ type: LoginInputDto })
   async login(
@@ -89,7 +88,7 @@ export class AuthController {
   }
 
   @Post('registration')
-  // @UseGuards(IpRestrictionGuard)
+  @UseGuards(IpRestrictionGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBody({ type: RegistrationInputDto })
   async registration(@Body() body: RegistrationInputDto) {
@@ -103,7 +102,7 @@ export class AuthController {
   }
 
   @Post('registration-confirmation')
-  // @UseGuards(IpRestrictionGuard)
+  @UseGuards(IpRestrictionGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBody({ type: RegistrationConfirmInputDto })
   async registrationConfirm(@Body() body: RegistrationConfirmInputDto) {
@@ -113,7 +112,7 @@ export class AuthController {
   }
 
   @Post('registration-email-resending')
-  // @UseGuards(IpRestrictionGuard)
+  @UseGuards(IpRestrictionGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBody({ type: RegistrationResendCodeInputDto })
   async resendConfirmCode(@Body() body: RegistrationResendCodeInputDto) {
@@ -124,7 +123,7 @@ export class AuthController {
   }
 
   @Post('password-recovery')
-  // @UseGuards(IpRestrictionGuard)
+  @UseGuards(IpRestrictionGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBody({ type: RegistrationResendCodeInputDto })
   async recoveryPass(@Body() body: RegistrationResendCodeInputDto) {
@@ -134,7 +133,7 @@ export class AuthController {
   }
 
   @Post('new-password')
-  // @UseGuards(IpRestrictionGuard)
+  @UseGuards(IpRestrictionGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBody({ type: NewPasswordInputDto })
   async setNewPassword(@Body() body: NewPasswordInputDto) {

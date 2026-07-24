@@ -10,6 +10,8 @@ import { randomUUID } from 'crypto';
 import { LoginDomainDto } from '../domain/dto/login.domain.dto';
 import { SessionsRepository } from '../infra/sessions.repository';
 import { UserSqlDto } from '../domain/sql-entity-dto/user.sql-dto';
+import { SessionSql } from '../domain/session.entity';
+import { SessionSqlDto } from '../domain/sql-entity-dto/session.sql-dto';
 
 export type LoginCommandReturn = { accessToken: string; refreshToken: string };
 
@@ -42,17 +44,15 @@ export class LoginUseCase implements ICommandHandler<LoginCommand> {
 
     const { exp, iat } = this.jwtService.decodeToken(refreshToken);
 
-    // todo Session - sql
-    // const session: SessionDocument = this.SessionModel.createSession({
-    //   ip,
-    //   exp,
-    //   iat,
-    //   userId,
-    //   deviceId,
-    //   deviceName,
-    // });
-    //
-    // await this.sessionsRepository.save(session);
+    const newSession: SessionSqlDto = SessionSql.createSession({
+      ip,
+      exp,
+      iat,
+      userId: user.id,
+      deviceId,
+      deviceName,
+    });
+    await this.sessionsRepository.createSession(newSession);
 
     return { accessToken, refreshToken };
   }
