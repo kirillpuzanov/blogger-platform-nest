@@ -1,22 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { User, UserDocument, type UserModelType } from '../domain/user.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { InjectModel } from '@nestjs/mongoose';
 import { UserSqlDto } from '../domain/sql-entity-dto/user.sql-dto';
 import { ConfirmationDataDomainDto } from '../domain/dto/confirmation-data.domain.dto';
 
 @Injectable()
 export class UsersRepository {
-  constructor(
-    @InjectDataSource() protected dataSource: DataSource,
-    @InjectModel(User.modelName) private UserModel: UserModelType,
-  ) {}
-
-  // todo - удалить, для поддержки остальных флоу
-  async save(user: UserDocument) {
-    await user.save();
-  }
+  constructor(@InjectDataSource() protected dataSource: DataSource) {}
 
   async createUser(user: UserSqlDto): Promise<string> {
     const result = await this.dataSource.query<[{ id: string }]>(
@@ -94,18 +84,62 @@ export class UsersRepository {
     );
   }
 
-  async getByConfirmCode(confirmCode: string): Promise<UserDocument | null> {
-    return this.UserModel.findOne({
-      'emailConfirmation.confirmationCode': confirmCode,
-    });
+  async updateIsConfirm(userId: string): Promise<void> {
+    return this.dataSource.query<void>(
+      `
+        UPDATE users
+        SET is_confirmed=true
+        WHERE id = $1
+        `,
+      [userId],
+    );
+  }
+
+  async updatePasswordHash(
+    userId: string,
+    newPasswordHash: string,
+  ): Promise<void> {
+    return this.dataSource.query<void>(
+      `
+        UPDATE users
+        SET password_hash=$1
+        WHERE id = $2
+        `,
+      [newPasswordHash, userId],
+    );
+  }
+
+  async getByConfirmCode(confirmCode: string): Promise<UserSqlDto | null> {
+    const result = await this.dataSource.query<UserSqlDto[]>(
+      `
+        SELECT *  FROM users
+        WHERE confirmation_code = $1
+        LIMIT 1`,
+      [confirmCode],
+    );
+
+    if (result.length === 0) {
+      return null;
+    }
+
+    return result[0];
   }
 
   async getByRecoveryPassCode(
-    confirmCode: string,
-  ): Promise<UserDocument | null> {
-    return this.UserModel.findOne({
-      'recoveryPassData.recoveryPassCode': confirmCode,
-    });
+    recoveryCode: string,
+  ): Promise<UserSqlDto | null> {
+    const result = await this.dataSource.query<UserSqlDto[]>(
+      `
+        SELECT *  FROM users
+        WHERE recovery_code = $1
+        LIMIT 1`,
+      [recoveryCode],
+    );
+
+    if (result.length === 0) {
+      return null;
+    }
+    return result[0];
   }
 }
 

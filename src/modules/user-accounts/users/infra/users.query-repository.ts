@@ -3,6 +3,7 @@ import { UserViewDto } from '../api/view-dto/user.view-dto';
 import {
   GetUsersQueryInputDto,
   sortByUsersQueryAdapter,
+  sortDirectionAdapter,
 } from '../api/input-dto/get-users-query.input-dto';
 import { PaginatedViewDto } from '../../../../core/dto/base-paginated.view-dto';
 import {
@@ -51,10 +52,15 @@ export class UsersQueryRepository {
 
     const offset = query.calculateSkip();
 
+    const sortByExpression =
+      sortByUsersQueryAdapter[sortBy] === 'created_at'
+        ? sortByUsersQueryAdapter[sortBy]
+        : `${sortByUsersQueryAdapter[sortBy]} COLLATE "C"`;
+
     const queryText = `
     SELECT * FROM public.users
-    ${whereClause}
-    ORDER BY ${sortByUsersQueryAdapter[sortBy]} ${sortDirection}
+    ${whereClause} 
+    ORDER BY ${sortByExpression} ${sortDirectionAdapter[sortDirection]}
     LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
   `;
 

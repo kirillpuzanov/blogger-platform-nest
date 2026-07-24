@@ -22,3 +22,8 @@ export const sortByUsersQueryAdapter = {
   login: 'login',
   email: 'email',
 };
+
+export const sortDirectionAdapter = {
+  asc: 'ASC',
+  desc: 'DESC',
+};

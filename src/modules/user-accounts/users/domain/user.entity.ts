@@ -54,7 +54,6 @@ export class UserSql implements UserSqlDto {
     user.login = dto.login;
     user.email = dto.email;
     user.password_hash = dto.passwordHash;
-    user.created_at = new Date();
 
     user.is_confirmed = Boolean(isConfirmed);
 

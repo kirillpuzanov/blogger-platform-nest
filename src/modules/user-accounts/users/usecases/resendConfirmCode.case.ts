@@ -5,8 +5,8 @@ import {
 } from '../../../../core/exceptions/domain.exception';
 import { UsersRepository } from '../infra/users.repository';
 import { EmailService } from '../../../notifications/email.service';
-import { MailTemplates } from '../api/view-dto/mail-templates';
 import { UserSql } from '../domain/user.entity';
+import { MailTemplates } from '../api/view-dto/mail-templates';
 
 export class ResendConfirmCodeCommand {
   constructor(public email: string) {}
