@@ -116,7 +116,6 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBody({ type: RegistrationResendCodeInputDto })
   async resendConfirmCode(@Body() body: RegistrationResendCodeInputDto) {
-    console.log('registration-email-resending');
     return this.commandBus.execute<ResendConfirmCodeCommand, void>(
       new ResendConfirmCodeCommand(body.email),
     );

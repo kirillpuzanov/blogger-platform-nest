@@ -22,6 +22,9 @@ export class TestingController {
     await Promise.all(promises);
 
     await this.dataSource.query<void>(`TRUNCATE TABLE users RESTART IDENTITY`);
+    await this.dataSource.query<void>(
+      `TRUNCATE TABLE sessions RESTART IDENTITY`,
+    );
 
     return {
       status: 'succeeded',

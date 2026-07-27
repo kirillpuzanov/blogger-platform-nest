@@ -54,7 +54,7 @@ export class RegistrationUseCase implements ICommandHandler<RegistrationCommand>
     const user = UserSql.createUser({ login, email, passwordHash });
 
     await this.usersRepository.createUser(user);
-    console.log('RegistrationUseCase user', user);
+
     this.emailService
       .sendMail(user.email, MailTemplates.registration(user.confirmation_code!))
       .catch((error) => console.error('error send email', error));

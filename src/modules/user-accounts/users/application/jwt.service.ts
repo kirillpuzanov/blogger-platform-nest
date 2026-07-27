@@ -9,6 +9,13 @@ type DecodedTokenData = {
   iat: number;
 };
 
+type ReturnedDecodedTokenData = {
+  userId: string;
+  deviceId: string;
+  exp: Date;
+  iat: Date;
+};
+
 @Injectable()
 export class JwtInternalService {
   constructor(
@@ -38,18 +45,27 @@ export class JwtInternalService {
     return { accessToken, refreshToken };
   }
 
-  decodeToken(token: string): DecodedTokenData {
+  decodeToken(token: string): ReturnedDecodedTokenData {
     const decoded = this.jwtService.decode<DecodedTokenData>(token);
     return {
       userId: decoded?.userId,
       deviceId: decoded?.deviceId,
       /**  переводим в миллисеунды, для удобства сравнения дальше */
-      exp: decoded?.exp ? decoded.exp * 1000 : Date.now(),
-      iat: decoded?.iat ? decoded.iat * 1000 : Date.now(),
+      exp:
+        typeof decoded?.exp === 'number'
+          ? new Date(decoded.exp * 1000)
+          : new Date(),
+      iat:
+        typeof decoded?.exp === 'number'
+          ? new Date(decoded.iat * 1000)
+          : new Date(),
     };
   }
 
-  verifyToken(token: string, secret: string): Partial<DecodedTokenData> {
+  verifyToken(
+    token: string,
+    secret: string,
+  ): Partial<ReturnedDecodedTokenData> {
     try {
       const verify = this.jwtService.verify<DecodedTokenData>(token, {
         secret,
@@ -57,10 +73,10 @@ export class JwtInternalService {
       return {
         userId: verify.userId,
         deviceId: verify.deviceId,
-        iat: verify?.iat ? verify?.iat * 1000 : Date.now(),
+        iat: verify?.iat ? new Date(verify?.iat * 1000) : new Date(),
       };
     } catch {
-      return { userId: undefined, deviceId: undefined, iat: Date.now() };
+      return { userId: undefined, deviceId: undefined, iat: new Date() };
     }
   }
 }

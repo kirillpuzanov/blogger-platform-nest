@@ -10,8 +10,8 @@ export class SessionSql implements SessionSqlDto {
   device_id: string;
   device_name: string;
   ip: string;
-  iat: number;
-  exp: number;
+  iat: Date;
+  exp: Date;
 
   static createSession(dto: CreateSessionDomainDto): SessionSqlDto {
     const session = new this();
@@ -46,10 +46,10 @@ export class Session {
   ip: string;
 
   @Prop({ type: Number, required: true })
-  iat: number;
+  iat: Date;
 
   @Prop({ type: Number, required: true })
-  exp: number;
+  exp: Date;
 
   static modelName = 'SessionModel';
   static collectionName = 'authDeviceSessions';

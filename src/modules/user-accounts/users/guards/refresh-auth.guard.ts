@@ -51,9 +51,9 @@ export class RefreshAuthGuard implements CanActivate {
     if (currentSession) {
       /** если переданный токен еще не протух, пренадлежит текущему пользователю, с той же дадой выпуска -> пропускаем дальше */
       if (
-        currentSession.exp > Date.now() &&
-        currentSession.iat === iat &&
-        userId === currentSession.userId
+        new Date(currentSession.exp) > new Date() &&
+        String(currentSession.iat) === String(iat) &&
+        userId === currentSession.user_id
       ) {
         request.user = { id: userId };
         return true;

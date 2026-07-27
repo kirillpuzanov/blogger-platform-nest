@@ -4,6 +4,6 @@ export class SessionSqlDto {
   device_id: string;
   device_name: string;
   ip: string;
-  iat: number;
-  exp: number;
+  iat: Date;
+  exp: Date;
 }

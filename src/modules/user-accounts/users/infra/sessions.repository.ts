@@ -13,7 +13,7 @@ export class SessionsRepository {
   async createSession(dto: SessionSqlDto): Promise<void> {
     const { iat, device_id, device_name, exp, ip, user_id } = dto;
     await this.dataSource.query(
-      `INSERT INTO sessions (iat, deviceId, deviceName, exp, ip, userId)
+      `INSERT INTO sessions (iat, device_id, device_name, exp, ip, user_id)
          VALUES ($1, $2, $3, $4, $5, $6)
          RETURNING id`,
       [iat, device_id, device_name, exp, ip, user_id],
