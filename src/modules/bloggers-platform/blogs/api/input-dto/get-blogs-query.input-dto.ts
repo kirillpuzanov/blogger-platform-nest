@@ -10,3 +10,8 @@ export class GetBlogsQueryInputDto extends BaseQueryParams {
   @IsOptional()
   searchNameTerm?: string | null = null;
 }
+
+export const sortByBlogsQueryAdapter = {
+  createdAt: 'created_at',
+  name: 'name',
+};
