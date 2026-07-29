@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Blog, type BlogModelType } from '../domain/blog.entity';
 import {
   GetBlogsQueryInputDto,
   sortByBlogsQueryAdapter,
@@ -13,15 +11,11 @@ import {
 } from '../../../../core/exceptions/domain.exception';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { sortDirectionAdapter } from '../../../user-accounts/users/api/input-dto/get-users-query.input-dto';
 import { BlogSqlDto } from '../domain/dto/blog.sql-dto';
 
 @Injectable()
 export class BlogsQueryRepository {
-  constructor(
-    @InjectModel(Blog.modelName) private BlogModel: BlogModelType,
-    @InjectDataSource() protected dataSource: DataSource,
-  ) {}
+  constructor(@InjectDataSource() protected dataSource: DataSource) {}
 
   async getAll(
     query: GetBlogsQueryInputDto,
@@ -51,7 +45,7 @@ export class BlogsQueryRepository {
     const queryText = `
     SELECT * FROM blogs
     ${whereClause} 
-    ORDER BY ${sortByExpression} ${sortDirectionAdapter[sortDirection]}
+    ORDER BY ${sortByExpression} ${sortDirection}
     LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
   `;
 

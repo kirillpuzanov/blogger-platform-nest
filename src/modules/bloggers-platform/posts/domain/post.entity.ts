@@ -1,8 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreatePostDto } from '../dto/create-post.dto';
-import { CreatePostDomainDto, NewestLikes } from './dto/create-post.domain-dto';
+import {
+  CreatePostDomainDto,
+  CreatePostSqlDomainDto,
+  NewestLikes,
+} from './dto/create-post.domain-dto';
 import { ExtendedLikesInfo } from './extended-likes.schema';
+import { PostSqlDto } from './dto/post.sql-dto';
 
 export const postTitleConstraints = {
   minLength: 1,
@@ -17,6 +22,32 @@ export const postContentConstraints = {
   minLength: 1,
   maxLength: 1000,
 };
+
+export class PostSql implements PostSqlDto {
+  id: string;
+  title: string;
+  short_description: string;
+  content: string;
+  blog_id: string;
+  blog_name: string;
+  created_at: Date;
+  likes_count: number;
+  dislikes_count: number;
+
+  static createPost(dto: CreatePostSqlDomainDto): PostSqlDto {
+    const post = new this();
+
+    post.title = dto.title;
+    post.short_description = dto.shortDescription;
+    post.content = dto.content;
+    post.blog_id = dto.blogId;
+    post.blog_name = dto.blogName;
+    post.likes_count = dto.dislikesCount;
+    post.dislikes_count = dto.likesCount;
+
+    return post;
+  }
+}
 
 @Schema({ timestamps: true })
 export class Post {

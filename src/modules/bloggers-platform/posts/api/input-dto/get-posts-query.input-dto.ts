@@ -6,3 +6,9 @@ export class GetPostsQueryInputDto extends BaseQueryParams {
   @IsEnum(PostsSortBy)
   sortBy = PostsSortBy.CreatedAt;
 }
+
+export const sortByPostsQueryAdapter = {
+  createdAt: 'created_at',
+  title: 'name',
+  blogName: 'blog_name',
+};

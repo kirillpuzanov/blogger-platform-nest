@@ -17,3 +17,13 @@ export type NewestLikes = {
   userId: string;
   login: string;
 };
+
+export class CreatePostSqlDomainDto {
+  title: string;
+  shortDescription: string;
+  content: string;
+  blogId: string;
+  blogName: string;
+  likesCount: number;
+  dislikesCount: number;
+}
