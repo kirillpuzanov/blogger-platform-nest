@@ -21,33 +21,34 @@ export class UpdatePostLikeUseCase implements ICommandHandler<UpdatePostLikeComm
   ) {}
 
   async execute(dto: UpdatePostLikeCommand): Promise<void> {
-    const { userId, newLikeStatus, postId } = dto;
-
-    const post = await this.postsRepository.findByIdOrFail(postId);
-
-    /** обновляем лайк / получаем дельту для изменения счетчика */
-    const likesCountData = await this.likeService.updateLike(
-      userId,
-      postId,
-      newLikeStatus,
-    );
-
-    const lastPostLikes = await this.likeRepository.getLastLikes(postId);
-    const newestLikes = lastPostLikes.map((el) => ({
-      addedAt: el.createdAt,
-      userId: el.author.userId,
-      login: el.author.userLogin,
-    }));
-
-    if (likesCountData && Object.keys(likesCountData).length > 0) {
-      post.updateLikeCount(
-        likesCountData.likesCount ?? 0,
-        likesCountData.dislikesCount ?? 0,
-      );
-    }
-
-    post.updateNewestLikes(newestLikes);
-
-    await this.postsRepository.save(post);
+    // const { userId, newLikeStatus, postId } = dto;
+    return Promise.resolve();
+    // todo
+    // const post = await this.postsRepository.findByIdOrFail(postId);
+    //
+    // /** обновляем лайк / получаем дельту для изменения счетчика */
+    // const likesCountData = await this.likeService.updateLike(
+    //   userId,
+    //   postId,
+    //   newLikeStatus,
+    // );
+    //
+    // const lastPostLikes = await this.likeRepository.getLastLikes(postId);
+    // const newestLikes = lastPostLikes.map((el) => ({
+    //   addedAt: el.createdAt,
+    //   userId: el.author.userId,
+    //   login: el.author.userLogin,
+    // }));
+    //
+    // if (likesCountData && Object.keys(likesCountData).length > 0) {
+    //   post.updateLikeCount(
+    //     likesCountData.likesCount ?? 0,
+    //     likesCountData.dislikesCount ?? 0,
+    //   );
+    // }
+    //
+    // post.updateNewestLikes(newestLikes);
+    //
+    // await this.postsRepository.save(post);
   }
 }

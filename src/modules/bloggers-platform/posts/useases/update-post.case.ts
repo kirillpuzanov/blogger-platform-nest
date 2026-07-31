@@ -1,6 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsRepository } from '../infra/posts.repository';
 import { UpdatePostDto } from '../dto/update-post.dto';
+import { BlogsRepository } from '../../blogs/infra/blogs.repository';
 
 export class UpdatePostCommand {
   constructor(public dto: UpdatePostDto) {}
@@ -8,15 +9,24 @@ export class UpdatePostCommand {
 
 @CommandHandler(UpdatePostCommand)
 export class UpdatePostUseCase implements ICommandHandler<UpdatePostCommand> {
-  constructor(private postsRepository: PostsRepository) {}
+  constructor(
+    private postsRepository: PostsRepository,
+    private blogRepository: BlogsRepository,
+  ) {}
 
   async execute({ dto }: UpdatePostCommand): Promise<void> {
-    const { title, blogId, content, shortDescription, postId } = dto;
+    const { title, content, shortDescription, postId, blogId } = dto;
 
+    await this.blogRepository.findByIdOrFail(blogId);
     const post = await this.postsRepository.findByIdOrFail(postId);
 
-    post.updatePost({ title, blogId, content, shortDescription });
-
-    await this.postsRepository.save(post);
+    return this.postsRepository.updatePost(
+      {
+        title,
+        content,
+        short_description: shortDescription,
+      },
+      post.id,
+    );
   }
 }

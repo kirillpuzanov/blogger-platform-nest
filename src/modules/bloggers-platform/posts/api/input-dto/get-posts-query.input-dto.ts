@@ -9,6 +9,6 @@ export class GetPostsQueryInputDto extends BaseQueryParams {
 
 export const sortByPostsQueryAdapter = {
   createdAt: 'created_at',
-  title: 'name',
+  title: 'title',
   blogName: 'blog_name',
 };

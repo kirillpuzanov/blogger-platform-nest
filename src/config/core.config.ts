@@ -71,6 +71,9 @@ export class CoreConfig {
   @IsNotEmpty({ message: 'Set Env variable REFRESH_TOKEN_EXPIRE_IN' })
   refreshExpireIn: StringValue;
 
+  @IsBoolean({ message: 'Set Env variable ENABLE_IP_RESTRICTION' })
+  isEnableIpRestriction: boolean;
+
   constructor(private configService: ConfigService<any, true>) {
     this.port = Number(this.configService.get('PORT'));
     this.mongoUrl = this.configService.get('MONGO_URL');
@@ -96,6 +99,9 @@ export class CoreConfig {
     this.sqlPort = Number(this.configService.get('SQL_PORT'));
     this.sqlUserName = this.configService.get('SQL_USER_NAME');
     this.sqlDbName = this.configService.get('SQL_DB_NAME');
+    this.isEnableIpRestriction = configValidation.convertToBoolean(
+      this.configService.get('ENABLE_IP_RESTRICTION'),
+    );
     configValidation.validateConfig(this);
   }
 }

@@ -136,9 +136,12 @@ export class BlogsSaController {
 
   @Delete('/:blogId/posts/:postId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deletePost(@Param('postId', ObjectIdValidationPipe) postId: string) {
+  async deletePost(
+    @Param('blogId', ObjectIdValidationPipe) blogId: string,
+    @Param('postId', ObjectIdValidationPipe) postId: string,
+  ) {
     return this.commandBus.execute<DeletePostCommand, void>(
-      new DeletePostCommand(postId),
+      new DeletePostCommand(postId, blogId),
     );
   }
 }

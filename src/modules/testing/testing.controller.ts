@@ -25,6 +25,8 @@ export class TestingController {
     await this.dataSource.query<void>(
       `TRUNCATE TABLE sessions RESTART IDENTITY`,
     );
+    await this.dataSource.query<void>(`TRUNCATE TABLE blogs RESTART IDENTITY`);
+    await this.dataSource.query<void>(`TRUNCATE TABLE posts RESTART IDENTITY`);
 
     return {
       status: 'succeeded',

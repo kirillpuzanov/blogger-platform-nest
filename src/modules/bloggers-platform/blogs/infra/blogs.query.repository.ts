@@ -79,7 +79,7 @@ export class BlogsQueryRepository {
 
   async getByIdOrFail(id: string): Promise<BlogViewDto> {
     const blogs = await this.dataSource.query<BlogSqlDto[]>(
-      `SELECT * FROM blogs WHERE "id"=$1`,
+      `SELECT * FROM blogs WHERE id=$1`,
       [id],
     );
 

@@ -64,7 +64,7 @@ export class PostsQueryRepository {
     userId: string | undefined,
   ): Promise<PostViewDto> {
     const posts = await this.dataSource.query<PostSqlDto[]>(
-      `SELECT * FROM posts WHERE "id"=$1`,
+      `SELECT * FROM posts WHERE id=$1`,
       [id],
     );
 
@@ -104,7 +104,7 @@ export class PostsQueryRepository {
     const postsByBlog = await this.dataSource.query<PostSqlDto[]>(
       `
       SELECT * FROM posts
-      WHERE "blog_id"=$1
+      WHERE blog_id=$1
       ORDER BY ${sortByExpression} ${sortDirection}
       LIMIT $2 OFFSET $3
     `,
@@ -112,7 +112,7 @@ export class PostsQueryRepository {
     );
 
     const countResult = await this.dataSource.query<[{ total: string }]>(
-      `SELECT COUNT(*) as total FROM posts WHERE "blog_id"=$1`,
+      `SELECT COUNT(*) as total FROM posts WHERE blog_id=$1`,
       [blogId],
     );
 

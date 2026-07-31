@@ -32,7 +32,7 @@ export class BlogSql implements BlogSqlDto {
     blog.name = dto.name;
     blog.description = dto.description;
     blog.website_url = dto.websiteUrl;
-    blog.is_membership = true;
+    blog.is_membership = false;
     return blog;
   }
 }
