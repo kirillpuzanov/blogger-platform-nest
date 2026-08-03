@@ -2,10 +2,38 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreateSessionDomainDto } from './dto/create-session.domain.dto';
 import { UpdateSessionDomainDto } from './dto/update-session.domain.dto';
+import { SessionSqlDto } from './sql-entity-dto/session.sql-dto';
 
-@Schema({ timestamps: true })
+export class SessionSql implements SessionSqlDto {
+  id: string;
+  user_id: string;
+  device_id: string;
+  device_name: string;
+  ip: string;
+  iat: Date;
+  exp: Date;
+
+  static createSession(dto: CreateSessionDomainDto): SessionSqlDto {
+    const session = new this();
+
+    session.user_id = dto.userId;
+    session.device_id = dto.deviceId;
+    session.device_name = dto.deviceName;
+
+    session.ip = dto.ip;
+    session.iat = dto.iat;
+    session.exp = dto.exp;
+
+    return session;
+  }
+}
+
+@Schema({
+  timestamps: true,
+  collection: 'authDeviceSessions',
+})
 export class Session {
-  @Prop({ type: String, required: true, unique: true })
+  @Prop({ type: String, required: true })
   userId: string;
 
   @Prop({ type: String, required: true, unique: true })
@@ -18,10 +46,10 @@ export class Session {
   ip: string;
 
   @Prop({ type: Number, required: true })
-  iat: number;
+  iat: Date;
 
   @Prop({ type: Number, required: true })
-  exp: number;
+  exp: Date;
 
   static modelName = 'SessionModel';
   static collectionName = 'authDeviceSessions';

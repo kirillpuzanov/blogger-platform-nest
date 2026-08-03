@@ -24,3 +24,22 @@ export class LogoutUseCase implements ICommandHandler<LogoutCommand> {
     await this.sessionsRepository.deleteSession(userId, deviceId);
   }
 }
+
+// Mongoose
+// @CommandHandler(LogoutCommand)
+// export class LogoutUseCase implements ICommandHandler<LogoutCommand> {
+//   constructor(
+//     private sessionsRepository: SessionsRepository,
+//     private jwtService: JwtInternalService,
+//   ) {}
+//
+//   async execute({ dto }: LogoutCommand): Promise<void> {
+//     /** проверка валидности текущего токена уже сделана в refreshTokenGuard */
+//     const { refreshToken } = dto;
+//
+//     const { userId, deviceId } = this.jwtService.decodeToken(refreshToken);
+//
+//     /** удаляем текущую сессию */
+//     await this.sessionsRepository.deleteSession(userId, deviceId);
+//   }
+// }

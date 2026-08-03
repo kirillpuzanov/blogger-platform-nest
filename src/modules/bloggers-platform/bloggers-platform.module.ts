@@ -28,6 +28,7 @@ import { CreateCommentUseCase } from './comments/usecases/create-comment.case';
 import { Comment, CommentSchema } from './comments/domain/comment.entity';
 import { Like, LikeSchema } from './likes/domain/like.entity';
 import { UserAccountsModule } from '../user-accounts/user-accounts.module';
+import { BlogsSaController } from './blogs/blogs-sa.controller';
 
 const cases = [
   CreateBlogUseCase,
@@ -72,7 +73,12 @@ const cases = [
 
     UserAccountsModule,
   ],
-  controllers: [BlogsController, PostsController, CommentsController],
+  controllers: [
+    BlogsController,
+    PostsController,
+    CommentsController,
+    BlogsSaController,
+  ],
   providers: [
     ...cases,
 

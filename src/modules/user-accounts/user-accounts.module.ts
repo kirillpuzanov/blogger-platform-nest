@@ -24,6 +24,8 @@ import { Session, SessionSchema } from './users/domain/session.entity';
 import { SessionsController } from './users/sessions.controller';
 import { SessionsQueryRepository } from './users/infra/sessions.query-repository';
 import { SessionsRepository } from './users/infra/sessions.repository';
+import { LogoutUseCase } from './users/usecases/logout.case';
+import { RefreshTokenUseCase } from './users/usecases/refreshToken.case';
 
 const useCases = [
   CreateUserUseCase,
@@ -34,6 +36,9 @@ const useCases = [
   SetNewPassUseCase,
   RecoveryPassUseCase,
   ResendConfirmCodeUseCase,
+
+  RefreshTokenUseCase,
+  LogoutUseCase,
 
   DeleteUserSessionUseCase,
   DeleteUserSessionsUseCase,
@@ -71,6 +76,6 @@ const useCases = [
     CryptoService,
     JwtInternalService,
   ],
-  exports: [UsersExternalRepository, JwtInternalService], //todo Session repo
+  exports: [UsersExternalRepository, JwtInternalService],
 })
 export class UserAccountsModule {}

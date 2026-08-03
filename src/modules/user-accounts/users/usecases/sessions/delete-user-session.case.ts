@@ -25,7 +25,7 @@ export class DeleteUserSessionUseCase implements ICommandHandler<DeleteUserSessi
       });
     }
 
-    if (deletedSession.userId !== userId) {
+    if (deletedSession.user_id !== userId) {
       throw new DomainException({
         code: DomainExceptionCode.Forbidden,
         message: 'you cannot delete other sessions',

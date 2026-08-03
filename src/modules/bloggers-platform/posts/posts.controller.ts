@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -13,20 +12,15 @@ import {
 } from '@nestjs/common';
 import { PaginatedViewDto } from '../../../core/dto/base-paginated.view-dto';
 import { PostViewDto } from './api/view-dto/post.view-dto';
-import { CreatePostInputDto } from './api/input-dto/create-post.input-dto';
 import { GetPostsQueryInputDto } from './api/input-dto/get-posts-query.input-dto';
 import { PostsQueryRepository } from './infra/posts.query.repository';
 import { ObjectIdValidationPipe } from '../../../core/pipes/object-id-validation.pipe';
 import { CommandBus } from '@nestjs/cqrs';
-import { CreatePostCommand } from './useases/create-post.case';
-import { UpdatePostCommand } from './useases/update-post.case';
-import { DeletePostCommand } from './useases/delete-post.case';
 import { ExtractUserFromRequest } from '../../../core/decorators/extract-user-from-request.decorator';
 import { OptionalAccessAuthGuard } from '../../user-accounts/users/guards/optional-access-auth.guard';
 import { CommentsQueryRepository } from '../comments/infra/comments.query.repository';
 import { GetCommentsQueryInputDto } from '../comments/api/input-dto/get-comments-query.input-dto';
-import { BasicAuthGuard } from '../../user-accounts/users/guards/basic-auth.guard';
-import { ApiBasicAuth, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { CreateCommentByPostInputDto } from '../comments/api/input-dto/create-comment-by-post.input-dto';
 import { CommentViewDto } from '../comments/api/view-dto/comment.view-dto';
 import { CreateCommentCommand } from '../comments/usecases/create-comment.case';
@@ -62,40 +56,6 @@ export class PostsController {
     return this.postsQueryRepository.getByIdOrFail(postId, user?.id);
   }
 
-  @ApiBasicAuth()
-  @Post()
-  @HttpCode(HttpStatus.CREATED)
-  @UseGuards(BasicAuthGuard)
-  async createPost(@Body() body: CreatePostInputDto): Promise<PostViewDto> {
-    const postId = await this.commandBus.execute<CreatePostCommand, string>(
-      new CreatePostCommand(body),
-    );
-    return this.postsQueryRepository.getByIdOrFail(postId, undefined);
-  }
-
-  @ApiBasicAuth()
-  @Put(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(BasicAuthGuard)
-  async updatePost(
-    @Param('id', ObjectIdValidationPipe) id: string,
-    @Body() body: CreatePostInputDto,
-  ) {
-    return this.commandBus.execute<UpdatePostCommand, void>(
-      new UpdatePostCommand(body, id),
-    );
-  }
-
-  @ApiBasicAuth()
-  @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(BasicAuthGuard)
-  async deletePost(@Param('id', ObjectIdValidationPipe) id: string) {
-    return this.commandBus.execute<DeletePostCommand, void>(
-      new DeletePostCommand(id),
-    );
-  }
-
   @Get(':postId/comments')
   @HttpCode(HttpStatus.OK)
   @UseGuards(OptionalAccessAuthGuard)
@@ -103,7 +63,7 @@ export class PostsController {
     @Query() query: GetCommentsQueryInputDto,
     @Param('postId') postId: string,
     @ExtractUserFromRequest() user: { id: string },
-  ) {
+  ): Promise<PaginatedViewDto<CommentViewDto[]>> {
     return this.commentsQueryRepository.getCommentsByPost(
       postId,
       query,
@@ -111,10 +71,10 @@ export class PostsController {
     );
   }
 
-  @ApiBearerAuth()
   @Post(':postId/comments')
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(AccessAuthGuard)
+  @ApiBearerAuth('access_token')
   async createCommentByPost(
     @Param('postId') postId: string,
     @Body() body: CreateCommentByPostInputDto,
@@ -133,10 +93,10 @@ export class PostsController {
     return this.commentsQueryRepository.getById(commentId, user.id);
   }
 
-  @ApiBearerAuth()
   @Put(':postId/like-status')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AccessAuthGuard)
+  @ApiBearerAuth('access_token')
   async updateLikeStatus(
     @Param('postId') postId: string,
     @Body() body: UpdatePostLikeInputDto,

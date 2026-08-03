@@ -28,6 +28,15 @@ export class CoreConfig {
   @IsNotEmpty({ message: 'Set Env variable DB_NAME' })
   dbName: string;
 
+  @IsNumber({}, { message: 'Set Env variable SQL_PORT, example: 3000' })
+  sqlPort: number;
+
+  @IsNotEmpty({ message: 'Set Env variable SQL_USER_NAME' })
+  sqlUserName: string;
+
+  @IsNotEmpty({ message: 'Set Env variable SQL_DB_NAME' })
+  sqlDbName: string;
+
   @IsBoolean({ message: 'Set Env variable IS_SWAGGER_ENABLED' })
   isSwaggerEnabled: boolean;
 
@@ -46,6 +55,9 @@ export class CoreConfig {
   @IsNotEmpty({ message: 'Set Env variable emailPass' })
   emailPass: string;
 
+  @IsBoolean({ message: 'Set Env variable sendInternalServerErrorDetails' })
+  sendInternalServerErrorDetails: boolean;
+
   @IsEnum(Environments, {
     message:
       'Set Env variable NODE_ENV, available values: ' +
@@ -58,6 +70,9 @@ export class CoreConfig {
 
   @IsNotEmpty({ message: 'Set Env variable REFRESH_TOKEN_EXPIRE_IN' })
   refreshExpireIn: StringValue;
+
+  @IsBoolean({ message: 'Set Env variable ENABLE_IP_RESTRICTION' })
+  isEnableIpRestriction: boolean;
 
   constructor(private configService: ConfigService<any, true>) {
     this.port = Number(this.configService.get('PORT'));
@@ -74,10 +89,19 @@ export class CoreConfig {
     this.email = this.configService.get('EMAIL');
     this.emailPass = this.configService.get('EMAIL_PASS');
     this.env = this.configService.get('NODE_ENV');
+    this.sendInternalServerErrorDetails = configValidation.convertToBoolean(
+      this.configService.get('SEND_INTERNAL_SERVER_ERROR_DETAILS'),
+    );
 
     this.accessExpireIn = this.configService.get('ACCESS_TOKEN_EXPIRE_IN');
     this.refreshExpireIn = this.configService.get('REFRESH_TOKEN_EXPIRE_IN');
 
+    this.sqlPort = Number(this.configService.get('SQL_PORT'));
+    this.sqlUserName = this.configService.get('SQL_USER_NAME');
+    this.sqlDbName = this.configService.get('SQL_DB_NAME');
+    this.isEnableIpRestriction = configValidation.convertToBoolean(
+      this.configService.get('ENABLE_IP_RESTRICTION'),
+    );
     configValidation.validateConfig(this);
   }
 }

@@ -12,19 +12,19 @@ import {
 } from '@nestjs/common';
 import { CreateUserInputDto } from './api/input-dto/create-user.input-dto';
 import { UserViewDto } from './api/view-dto/user.view-dto';
-import { UsersQueryRepository } from './infra/users.query-repository';
 import { GetUsersQueryInputDto } from './api/input-dto/get-users-query.input-dto';
-import { PaginatedViewDto } from '../../../core/dto/base-paginated.view-dto';
 import { ObjectIdValidationPipe } from '../../../core/pipes/object-id-validation.pipe';
 import { BasicAuthGuard } from './guards/basic-auth.guard';
 import { ApiBasicAuth, ApiBody } from '@nestjs/swagger';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from './usecases/admins/create-user.case';
 import { DeleteUserCommand } from './usecases/admins/delete-user.case';
+import { PaginatedViewDto } from '../../../core/dto/base-paginated.view-dto';
+import { UsersQueryRepository } from './infra/users.query-repository';
 
-@Controller('users')
+@Controller('sa/users')
 @UseGuards(BasicAuthGuard)
-@ApiBasicAuth('basicAuth')
+@ApiBasicAuth('basic_auth')
 export class UsersController {
   constructor(
     private usersQueryRepository: UsersQueryRepository,

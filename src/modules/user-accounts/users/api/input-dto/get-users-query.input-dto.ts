@@ -14,3 +14,14 @@ export class GetUsersQueryInputDto extends BaseQueryParams {
   @IsOptional()
   searchEmailTerm: string | null = null;
 }
+
+export const sortByUsersQueryAdapter = {
+  createdAt: 'created_at',
+  login: 'login',
+  email: 'email',
+};
+
+export const sortDirectionAdapter = {
+  asc: 'ASC',
+  desc: 'DESC',
+};

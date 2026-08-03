@@ -1,6 +1,6 @@
 export class UpdateSessionDomainDto {
-  exp: number;
-  iat: number;
+  exp: Date;
+  iat: Date;
   userId: string;
   deviceId: string;
 }

@@ -1,10 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { InjectModel } from '@nestjs/mongoose';
-
-import { Post, type PostModelType } from '../domain/post.entity';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { BlogsQueryRepository } from '../../blogs/infra/blogs.query.repository';
 import { PostsRepository } from '../infra/posts.repository';
+import { PostSql } from '../domain/post.entity';
 
 export class CreatePostCommand {
   constructor(public dto: CreatePostDto) {}
@@ -13,8 +11,6 @@ export class CreatePostCommand {
 @CommandHandler(CreatePostCommand)
 export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
   constructor(
-    @InjectModel(Post.modelName)
-    private PostModel: PostModelType,
     private blogsQueryRepository: BlogsQueryRepository,
     private postsRepository: PostsRepository,
   ) {}
@@ -22,22 +18,17 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
   async execute({ dto }: CreatePostCommand): Promise<string> {
     const { content, shortDescription, title, blogId } = dto;
     const blog = await this.blogsQueryRepository.getByIdOrFail(blogId);
-
-    const newPost = this.PostModel.createPost({
+    const newPost = PostSql.createPost({
       blogId,
       content,
       shortDescription,
       title,
       blogName: blog.name,
-      createdAt: new Date(),
-      extendedLikesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        newestLikes: [],
-      },
+      likesCount: 0,
+      dislikesCount: 0,
     });
 
-    await this.postsRepository.save(newPost);
-    return newPost._id.toString();
+    const newPostId = await this.postsRepository.createPost(newPost);
+    return newPostId;
   }
 }

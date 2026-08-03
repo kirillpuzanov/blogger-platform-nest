@@ -39,10 +39,10 @@ export class CommentsController {
     return this.commentsQueryRepository.getById(commentId, user.id);
   }
 
-  @ApiBearerAuth()
   @Put(':commentId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AccessAuthGuard)
+  @ApiBearerAuth('access_token')
   async updateComment(
     @Param('commentId', ObjectIdValidationPipe) commentId: string,
     @ExtractUserFromRequest() user: { id: string },
@@ -53,10 +53,10 @@ export class CommentsController {
     );
   }
 
-  @ApiBearerAuth()
   @Delete(':commentId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AccessAuthGuard)
+  @ApiBearerAuth('access_token')
   async deleteComment(
     @Param('commentId', ObjectIdValidationPipe) commentId: string,
     @ExtractUserFromRequest() user: { id: string },
@@ -66,10 +66,10 @@ export class CommentsController {
     );
   }
 
-  @ApiBearerAuth()
   @Put(':commentId/like-status')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AccessAuthGuard)
+  @ApiBearerAuth('access_token')
   async updateLikeStatus(
     @Param('commentId', ObjectIdValidationPipe) commentId: string,
     @ExtractUserFromRequest() user: { id: string },

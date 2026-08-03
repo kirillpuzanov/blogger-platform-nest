@@ -37,7 +37,7 @@ export class CreateCommentUseCase implements ICommandHandler<CreateCommentComman
     }
 
     const newComment = this.CommentModel.createComment({
-      blogId: post.blogId,
+      blogId: post.blog_id,
       content,
       postId,
       login: user.login,

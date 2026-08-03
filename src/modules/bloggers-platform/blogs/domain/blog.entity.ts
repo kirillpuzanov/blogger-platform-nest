@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { CreateBlogDto } from '../dto/create-blog.dto';
 import { HydratedDocument, Model } from 'mongoose';
+import { BlogSqlDto } from './dto/blog.sql-dto';
 
 export const blogNameConstraints = {
   minLength: 1,
@@ -17,6 +18,24 @@ export const blogWebUrlConstraints = {
   minLength: 1,
   maxLength: 100,
 };
+
+export class BlogSql implements BlogSqlDto {
+  id: string;
+  name: string;
+  description: string;
+  website_url: string;
+  created_at: Date;
+  is_membership: boolean;
+
+  static createBlog(dto: CreateBlogDto): BlogSqlDto {
+    const blog = new this();
+    blog.name = dto.name;
+    blog.description = dto.description;
+    blog.website_url = dto.websiteUrl;
+    blog.is_membership = false;
+    return blog;
+  }
+}
 
 @Schema({ timestamps: true })
 export class Blog {
