@@ -96,7 +96,6 @@ export class PostsQueryRepository {
     );
 
     const likesMap = await this.getNewestLikesPosts(Array(postId));
-
     return PostViewDto.mapToViewSql(posts[0], userLikes, likesMap[postId]);
   }
 
@@ -166,12 +165,15 @@ export class PostsQueryRepository {
     const newestLikesAllPosts =
       await this.likeQueryRepository.getNewestLikesForManyPosts(postsIds);
 
-    const likesMap: Record<string, NewestLikes[]> = {};
+    const likesMap: Record<string, NewestLikes[]> = postsIds.reduce(
+      (acc, el) => ({ ...acc, [el]: [] }),
+      {},
+    );
     newestLikesAllPosts.forEach((like) => {
-      if (!likesMap[like.post_id]) {
-        likesMap[like.post_id] = [];
+      if (!likesMap[like.parent_id]) {
+        likesMap[like.parent_id] = [];
       }
-      likesMap[like.post_id].push({
+      likesMap[like.parent_id].push({
         addedAt: like.created_at,
         userId: like.user_id,
         login: like.user_login,

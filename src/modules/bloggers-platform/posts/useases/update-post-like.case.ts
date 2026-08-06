@@ -3,7 +3,6 @@ import { PostsRepository } from '../infra/posts.repository';
 import { LikeStatus } from '../../../../core/dto/like-status';
 import { LikeService } from '../../likes/like.service';
 import { LikeRepository } from '../../likes/infra/like.repository';
-import { NewestLikeSqlDto } from '../domain/newest-like-sql.dto';
 
 export class UpdatePostLikeCommand {
   constructor(
@@ -34,14 +33,6 @@ export class UpdatePostLikeUseCase implements ICommandHandler<UpdatePostLikeComm
       newLikeStatus,
     );
 
-    /** получаем последние 3 лайка для поста */
-    const lastPostLikes = await this.likeRepository.getLastLikes(postId);
-
-    /** преобразуем в структуру NewestLikeSqlDto для сохранения в post-newest-like таблице */
-    const newestLikes = lastPostLikes.map((el) =>
-      NewestLikeSqlDto.createNewestLikeSqlDto(el, post.id),
-    );
-
     /** если есть дельта  лайков - обновляем счетчик в посте */
     if (likesCountData && Object.keys(likesCountData).length > 0) {
       await this.postsRepository.updateLikeCount(
@@ -49,11 +40,6 @@ export class UpdatePostLikeUseCase implements ICommandHandler<UpdatePostLikeComm
         likesCountData.dislikesCount ?? 0,
         post.id,
       );
-    }
-
-    /** если список последних лайков поста - обновляем их в отдельной таблице */
-    if (lastPostLikes.length) {
-      await this.postsRepository.updateNewestLikes(newestLikes, post.id);
     }
   }
 }

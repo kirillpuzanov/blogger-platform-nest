@@ -39,11 +39,21 @@ export class LikeQueryRepository {
   ): Promise<NewestLikeSqlDto[]> {
     return this.dataSource.query<NewestLikeSqlDto[]>(
       `
-         SELECT  user_id, user_login, created_at FROM post_newest_like
-         WHERE post_id = ANY($1)
-          ORDER BY created_at DESC
-         `,
-      [postsIds],
+      SELECT  parent_id, user_id, user_login, created_at
+      FROM (
+        SELECT 
+          parent_id,
+          user_id,
+          user_login,
+          created_at,
+          ROW_NUMBER() OVER (PARTITION BY parent_id ORDER BY created_at DESC) as rn
+        FROM likes
+        WHERE parent_id = ANY($1) AND status = $2
+      ) ranked
+      WHERE rn <= 3
+      ORDER BY parent_id, created_at DESC
+    `,
+      [postsIds, LikeStatus.Like],
     );
   }
 }

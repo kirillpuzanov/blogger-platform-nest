@@ -23,7 +23,7 @@ export class LikeRepository {
   ): Promise<void> {
     return this.dataSource.query<void>(
       `UPDATE likes
-       SET status=$1,
+        SET status=$1
         WHERE id=$2
         `,
       [newLikeStatus, likeId],
@@ -36,18 +36,6 @@ export class LikeRepository {
       [parentId, userId],
     );
     return result[0];
-  }
-
-  async getLastLikes(parentId: string, limit = 3): Promise<LikeSqlDto[]> {
-    return this.dataSource.query<LikeSqlDto[]>(
-      `
-      SELECT * FROM likes
-      WHERE parent_id = $1 AND status = $2
-      ORDER BY created_at DESC
-      LIMIT $2
-    `,
-      [parentId, LikeStatus.Like, limit],
-    );
   }
 
   async deleteEntityAllLikes(parentId: string): Promise<void> {
