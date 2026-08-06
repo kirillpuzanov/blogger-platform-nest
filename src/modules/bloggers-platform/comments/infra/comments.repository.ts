@@ -31,7 +31,7 @@ export class CommentsRepository {
         user_id,
         user_login,
         likes_count,
-        dislikes_count,
+        dislikes_count
        )
       VALUES ($1, $2,$3, $4, $5, $6, $7)
       RETURNING id

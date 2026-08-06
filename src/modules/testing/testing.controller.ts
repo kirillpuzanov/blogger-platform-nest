@@ -4,7 +4,14 @@ import { Controller, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
-const SQL_COLLECTIONS = ['users', 'sessions', 'blogs', 'posts'];
+const SQL_COLLECTIONS = [
+  'posts',
+  'comments',
+  'blogs',
+  'sessions',
+  'likes',
+  'users',
+];
 
 @Controller('testing')
 export class TestingController {
@@ -23,13 +30,12 @@ export class TestingController {
     });
     await Promise.all(promises);
 
-    const sqlPromises = SQL_COLLECTIONS.map((collection) => {
-      return this.dataSource.query<void>(
-        `TRUNCATE TABLE ${collection} RESTART IDENTITY`,
-      );
-    });
-
-    await Promise.all(sqlPromises);
+    await this.dataSource.query(
+      `
+      TRUNCATE TABLE ${SQL_COLLECTIONS.join(', ')}
+      RESTART IDENTITY CASCADE;
+    `,
+    );
 
     return {
       status: 'succeeded',
