@@ -8,6 +8,7 @@ import { DataSource } from 'typeorm';
 import { QueryResult } from 'pg';
 import { PostSqlDto } from '../domain/dto/post.sql-dto';
 import { UpdatePostSqlDomainDto } from '../domain/dto/update-post.domain-dto';
+import { NewestLikeSqlDto } from '../domain/newest-like-sql.dto';
 
 @Injectable()
 export class PostsRepository {
@@ -109,6 +110,54 @@ export class PostsRepository {
         WHERE blog_id=$2
         `,
       [blogName, blogId],
+    );
+  }
+
+  async updateLikeCount(
+    likesCount: number,
+    dislikesCount: number,
+    postId: string,
+  ): Promise<void> {
+    return this.dataSource.query<void>(
+      `
+        UPDATE posts
+        SET likes_count=likes_count +$1, dislikes_count=dislikes_count + $2
+        WHERE id = $3
+        `,
+      [likesCount, dislikesCount, postId],
+    );
+  }
+
+  async updateNewestLikes(
+    newestLikes: NewestLikeSqlDto[],
+    postId: string,
+  ): Promise<void> {
+    /** если пришли сюда значит есть новые лайки, удаляем сначала старые */
+    await this.dataSource.query(`DELETE FROM newest_likes WHERE post_id = $1`, [
+      postId,
+    ]);
+
+    /** Вставляем новые */
+    const values = newestLikes
+      .map(
+        (_, i) =>
+          `($${i * 4 + 1}, $${i * 4 + 2}, $${i * 4 + 3}, $${i * 4 + 4})`,
+      )
+      .join(', ');
+
+    const params = newestLikes.flatMap((like) => [
+      like.post_id,
+      like.user_id,
+      like.user_login,
+      like.created_at,
+    ]);
+
+    await this.dataSource.query(
+      `
+      INSERT INTO newest_likes (post_id, user_id, user_login, created_at)
+      VALUES ${values}
+    `,
+      params,
     );
   }
 }

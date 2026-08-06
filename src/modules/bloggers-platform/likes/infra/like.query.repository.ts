@@ -3,6 +3,7 @@ import { LikeStatus } from '../../../../core/dto/like-status';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { LikeSqlDto } from '../domain/dto/like.sql-dto';
+import { NewestLikeSqlDto } from '../../posts/domain/newest-like-sql.dto';
 
 @Injectable()
 export class LikeQueryRepository {
@@ -31,5 +32,18 @@ export class LikeQueryRepository {
     }
 
     return myLikes;
+  }
+
+  async getNewestLikesForManyPosts(
+    postsIds: string[],
+  ): Promise<NewestLikeSqlDto[]> {
+    return this.dataSource.query<NewestLikeSqlDto[]>(
+      `
+         SELECT  user_id, user_login, created_at FROM post_newest_like
+         WHERE post_id = ANY($1)
+          ORDER BY created_at DESC
+         `,
+      [postsIds],
+    );
   }
 }
