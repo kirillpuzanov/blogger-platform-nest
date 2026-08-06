@@ -32,7 +32,7 @@ export class DeleteCommentUseCase implements ICommandHandler<DeleteCommentComman
     }
 
     /** комментарий был создан не этим пользователем */
-    if (comment.commentatorInfo?.userId !== userId) {
+    if (comment.user_id !== userId) {
       throw new DomainException({
         code: DomainExceptionCode.Forbidden,
         message: 'no access',

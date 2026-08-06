@@ -7,7 +7,11 @@ import {
   DomainExceptionCode,
 } from '../../../../core/exceptions/domain.exception';
 import { InjectModel } from '@nestjs/mongoose';
-import { Comment, type CommentModelType } from '../domain/comment.entity';
+import {
+  Comment,
+  type CommentModelType,
+  CommentSql,
+} from '../domain/comment.entity';
 import { UsersExternalRepository } from '../../../user-accounts/users/infra/users-external.repository';
 
 export class CreateCommentCommand {
@@ -36,7 +40,7 @@ export class CreateCommentUseCase implements ICommandHandler<CreateCommentComman
       });
     }
 
-    const newComment = this.CommentModel.createComment({
+    const newComment = CommentSql.createComment({
       blogId: post.blog_id,
       content,
       postId,
@@ -44,8 +48,9 @@ export class CreateCommentUseCase implements ICommandHandler<CreateCommentComman
       userId: user.id,
     });
 
-    await this.commentsRepository.save(newComment);
+    const newCommentsId =
+      await this.commentsRepository.createComment(newComment);
 
-    return newComment._id.toString();
+    return newCommentsId;
   }
 }
