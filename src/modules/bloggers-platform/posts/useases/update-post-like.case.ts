@@ -2,7 +2,6 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsRepository } from '../infra/posts.repository';
 import { LikeStatus } from '../../../../core/dto/like-status';
 import { LikeService } from '../../likes/like.service';
-import { LikeRepository } from '../../likes/infra/like.repository';
 
 export class UpdatePostLikeCommand {
   constructor(
@@ -17,7 +16,6 @@ export class UpdatePostLikeUseCase implements ICommandHandler<UpdatePostLikeComm
   constructor(
     private postsRepository: PostsRepository,
     private likeService: LikeService,
-    private likeRepository: LikeRepository,
   ) {}
 
   async execute(dto: UpdatePostLikeCommand): Promise<void> {

@@ -1,25 +1,23 @@
-import { ObjectId } from 'mongodb';
-import {
-  Comment,
-  CommentDocument,
-  type CommentModelType,
-} from '../domain/comment.entity';
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import {
   DomainException,
   DomainExceptionCode,
 } from '../../../../core/exceptions/domain.exception';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { CommentSqlDto } from '../domain/comment.sql-dto';
+import { QueryResult } from 'pg';
 
 @Injectable()
 export class CommentsRepository {
-  constructor(
-    @InjectModel(Comment.modelName)
-    private CommentModel: CommentModelType,
-  ) {}
+  constructor(@InjectDataSource() protected dataSource: DataSource) {}
 
-  async findByIdOrFail(id: string): Promise<CommentDocument> {
-    const comment = await this.CommentModel.findOne({ _id: new ObjectId(id) });
+  async findByIdOrFail(id: string): Promise<CommentSqlDto> {
+    const result = await this.dataSource.query<CommentSqlDto[]>(
+      `SELECT * FROM comments WHERE id=$1`,
+      [id],
+    );
+    const comment = result[0];
 
     if (!comment) {
       throw new DomainException({
@@ -31,11 +29,14 @@ export class CommentsRepository {
   }
 
   async deleteOne(commentId: string): Promise<void> {
-    const res = await this.CommentModel.deleteOne({
-      _id: new ObjectId(commentId),
-    });
+    const result = await this.dataSource.query<number[]>(
+      `
+      DELETE FROM comments
+      WHERE id=$1`,
+      [commentId],
+    );
 
-    if (res.deletedCount < 1) {
+    if (result[1] < 1) {
       throw new DomainException({
         code: DomainExceptionCode.NotFound,
         message: 'comment not found',
@@ -44,10 +45,12 @@ export class CommentsRepository {
   }
 
   async deleteMany(parentId: string): Promise<void> {
-    await this.CommentModel.deleteMany({ postId: parentId });
-  }
-
-  async save(comment: CommentDocument) {
-    await comment.save();
+    await this.dataSource.query<QueryResult>(
+      `
+        DELETE from posts
+        WHERE blog_id=$1
+    `,
+      [parentId],
+    );
   }
 }

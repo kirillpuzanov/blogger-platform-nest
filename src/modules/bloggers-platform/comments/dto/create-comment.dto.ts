@@ -11,3 +11,11 @@ export class CreateCommentDomainDto {
   userId: string;
   login: string;
 }
+
+export class CreateCommentSqlDomainDto {
+  postId: string;
+  content: string;
+  blogId: string;
+  userId: string;
+  login: string;
+}

@@ -1,12 +1,42 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { CommentatorInfo, LikesInfo } from './comment-additional.schema';
 import { HydratedDocument, Model } from 'mongoose';
-import { CreateCommentDomainDto } from '../dto/create-comment.dto';
+import {
+  CreateCommentDomainDto,
+  CreateCommentSqlDomainDto,
+} from '../dto/create-comment.dto';
+import { CommentSqlDto } from './comment.sql-dto';
 
 export const commentContentConstraints = {
   minLength: 20,
   maxLength: 300,
 };
+
+export class CommentSql implements CommentSqlDto {
+  id: string;
+  blog_id: string;
+  post_id: string;
+  content: string;
+  user_id: string;
+  user_login: string;
+  created_at: Date;
+  likes_count: number;
+  dislikes_count: number;
+
+  static createComment(dto: CreateCommentSqlDomainDto): CommentSqlDto {
+    const comment = new this();
+
+    comment.post_id = dto.postId;
+    comment.blog_id = dto.blogId;
+    comment.content = dto.content;
+    comment.user_id = dto.userId;
+    comment.user_login = dto.login;
+    comment.likes_count = 0;
+    comment.dislikes_count = 0;
+
+    return comment;
+  }
+}
 
 @Schema({ timestamps: true })
 export class Comment {
