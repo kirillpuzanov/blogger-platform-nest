@@ -1,10 +1,9 @@
-import { ObjectId } from 'mongodb';
-
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Comment, type CommentModelType } from '../domain/comment.entity';
 import { CommentViewDto } from '../api/view-dto/comment.view-dto';
-import { GetCommentsQueryInputDto } from '../api/input-dto/get-comments-query.input-dto';
+import {
+  GetCommentsQueryInputDto,
+  sortByCommentsQueryAdapter,
+} from '../api/input-dto/get-comments-query.input-dto';
 import { PaginatedViewDto } from '../../../../core/dto/base-paginated.view-dto';
 import { PostsQueryRepository } from '../../posts/infra/posts.query.repository';
 import { LikeQueryRepository } from '../../likes/infra/like.query.repository';
@@ -12,12 +11,14 @@ import {
   DomainException,
   DomainExceptionCode,
 } from '../../../../core/exceptions/domain.exception';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { CommentSqlDto } from '../domain/comment.sql-dto';
 
 @Injectable()
 export class CommentsQueryRepository {
   constructor(
-    @InjectModel(Comment.modelName)
-    private CommentModel: CommentModelType,
+    @InjectDataSource() protected dataSource: DataSource,
     private postsQueryRepository: PostsQueryRepository,
     private likeQueryRepository: LikeQueryRepository,
   ) {}
@@ -26,7 +27,12 @@ export class CommentsQueryRepository {
     id: string,
     userId: string | undefined,
   ): Promise<CommentViewDto> {
-    const comment = await this.CommentModel.findOne({ _id: new ObjectId(id) });
+    const comments = await this.dataSource.query<CommentSqlDto[]>(
+      `SELECT * FROM comments WHERE id=$1`,
+      [id],
+    );
+
+    const comment = comments[0];
 
     if (!comment) {
       throw new DomainException({
@@ -36,10 +42,10 @@ export class CommentsQueryRepository {
     }
 
     const userLikes = await this.likeQueryRepository.getUserLikes(userId, [
-      comment._id.toString(),
+      comment.id,
     ]);
 
-    return CommentViewDto.mapToView(comment, userLikes);
+    return CommentViewDto.mapToViewSql(comment, userLikes);
   }
 
   async getCommentsByPost(
@@ -58,22 +64,38 @@ export class CommentsQueryRepository {
       });
     }
 
-    const commentsByPost = await this.CommentModel.find({ postId })
-      .sort({ [sortBy]: sortDirection })
-      .skip(query.calculateSkip())
-      .limit(pageSize)
-      .lean();
+    const offset = query.calculateSkip();
 
-    const totalCount = await this.CommentModel.countDocuments({ postId });
+    const sortByExpression =
+      sortByCommentsQueryAdapter[sortBy] === 'created_at'
+        ? sortByCommentsQueryAdapter[sortBy]
+        : `${sortByCommentsQueryAdapter[sortBy]} COLLATE "C"`;
 
-    const commentsIds = commentsByPost.map((el) => el._id.toString());
-    const myLikes = await this.likeQueryRepository.getUserLikes(
+    const commentsByPost = await this.dataSource.query<CommentSqlDto[]>(
+      `
+      SELECT * FROM comments
+      WHERE post_id=$1
+      ORDER BY ${sortByExpression} ${sortDirection}
+      LIMIT $2 OFFSET $3
+    `,
+      [postId, pageSize, offset],
+    );
+
+    const countResult = await this.dataSource.query<[{ total: string }]>(
+      `SELECT COUNT(*) as total FROM comments WHERE post_id=$1`,
+      [postId],
+    );
+
+    const totalCount = Number(countResult[0]?.total || 0);
+    const commentsIds = commentsByPost.map((el) => el.id);
+
+    const userLikes = await this.likeQueryRepository.getUserLikes(
       userId,
       commentsIds,
     );
 
     const commentsByPostView = commentsByPost.map((el) =>
-      CommentViewDto.mapToView(el, myLikes),
+      CommentViewDto.mapToViewSql(el, userLikes),
     );
 
     return PaginatedViewDto.mapToView({

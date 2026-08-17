@@ -2,6 +2,26 @@ import { HydratedDocument, Model } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { LikeStatus } from '../../../../core/dto/like-status';
 import { CreateLikeDto } from './create-like.dto';
+import { LikeSqlDto } from './dto/like.sql-dto';
+
+export class LikeSql implements LikeSqlDto {
+  id: string;
+  parent_id: string;
+  user_id: string;
+  user_login: string;
+  status: LikeStatus;
+  created_at: Date;
+
+  static createLike(dto: CreateLikeDto): LikeSqlDto {
+    const like = new this();
+    like.parent_id = dto.parentId;
+    like.user_id = dto.userId;
+    like.user_login = dto.userLogin;
+    like.status = dto.status;
+
+    return like;
+  }
+}
 
 @Schema({ _id: false })
 export class LikeAuthor {

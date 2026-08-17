@@ -1,25 +1,87 @@
-import { ObjectId } from 'mongodb';
-import {
-  Comment,
-  CommentDocument,
-  type CommentModelType,
-} from '../domain/comment.entity';
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import {
   DomainException,
   DomainExceptionCode,
 } from '../../../../core/exceptions/domain.exception';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { CommentSqlDto } from '../domain/comment.sql-dto';
+import { QueryResult } from 'pg';
 
 @Injectable()
 export class CommentsRepository {
-  constructor(
-    @InjectModel(Comment.modelName)
-    private CommentModel: CommentModelType,
-  ) {}
+  constructor(@InjectDataSource() protected dataSource: DataSource) {}
 
-  async findByIdOrFail(id: string): Promise<CommentDocument> {
-    const comment = await this.CommentModel.findOne({ _id: new ObjectId(id) });
+  async createComment(comment: CommentSqlDto) {
+    const {
+      blog_id,
+      post_id,
+      content,
+      user_id,
+      user_login,
+      likes_count,
+      dislikes_count,
+    } = comment;
+    const result = await this.dataSource.query<[{ id: string }]>(
+      `
+      INSERT INTO comments (
+        blog_id,
+        post_id,
+        content,
+        user_id,
+        user_login,
+        likes_count,
+        dislikes_count
+       )
+      VALUES ($1, $2,$3, $4, $5, $6, $7)
+      RETURNING id
+    `,
+      [
+        blog_id,
+        post_id,
+        content,
+        user_id,
+        user_login,
+        likes_count,
+        dislikes_count,
+      ],
+    );
+
+    return result[0].id;
+  }
+
+  async updateComment(content: string, commentId: string): Promise<void> {
+    return this.dataSource.query<void>(
+      `
+        UPDATE comments
+        SET content=$1
+        WHERE id = $2
+        `,
+      [content, commentId],
+    );
+  }
+
+  async updateLikeCount(
+    commentId: string,
+    likeCount: number,
+    dislikeCount: number,
+  ): Promise<void> {
+    return this.dataSource.query<void>(
+      `
+        UPDATE comments
+        SET likes_count=$1, dislikes_count=$2
+        WHERE id = $3
+        `,
+      [likeCount, dislikeCount, commentId],
+    );
+  }
+
+  async findByIdOrFail(id: string): Promise<CommentSqlDto> {
+    const result = await this.dataSource.query<CommentSqlDto[]>(
+      `SELECT * FROM comments WHERE id=$1`,
+      [id],
+    );
+    const comment = result[0];
 
     if (!comment) {
       throw new DomainException({
@@ -31,11 +93,14 @@ export class CommentsRepository {
   }
 
   async deleteOne(commentId: string): Promise<void> {
-    const res = await this.CommentModel.deleteOne({
-      _id: new ObjectId(commentId),
-    });
+    const result = await this.dataSource.query<number[]>(
+      `
+      DELETE FROM comments
+      WHERE id=$1`,
+      [commentId],
+    );
 
-    if (res.deletedCount < 1) {
+    if (result[1] < 1) {
       throw new DomainException({
         code: DomainExceptionCode.NotFound,
         message: 'comment not found',
@@ -44,10 +109,12 @@ export class CommentsRepository {
   }
 
   async deleteMany(parentId: string): Promise<void> {
-    await this.CommentModel.deleteMany({ postId: parentId });
-  }
-
-  async save(comment: CommentDocument) {
-    await comment.save();
+    await this.dataSource.query<QueryResult>(
+      `
+        DELETE from posts
+        WHERE blog_id=$1
+    `,
+      [parentId],
+    );
   }
 }

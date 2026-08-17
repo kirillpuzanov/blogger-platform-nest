@@ -45,12 +45,11 @@ export class UpdateCommentLikeUseCase implements ICommandHandler<UpdateCommentLi
 
     /** обновляем счетчик лайков комментария */
     if (likeCountData && Object.keys(likeCountData).length > 0) {
-      comment.updateLikeCount(
+      await this.commentsRepository.updateLikeCount(
+        commentId,
         likeCountData.likesCount ?? 0,
         likeCountData.dislikesCount ?? 0,
       );
-
-      await this.commentsRepository.save(comment);
     }
   }
 }

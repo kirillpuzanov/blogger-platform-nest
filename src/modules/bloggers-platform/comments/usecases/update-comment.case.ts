@@ -33,14 +33,13 @@ export class UpdateCommentUseCase implements ICommandHandler<UpdateCommentComman
     }
 
     /** комментарий был создан не этим пользователем */
-    if (comment.commentatorInfo?.userId !== userId) {
+    if (comment.user_id !== userId) {
       throw new DomainException({
         code: DomainExceptionCode.Forbidden,
         message: 'no access',
       });
     }
 
-    comment.updateComment(content);
-    await this.commentsRepository.save(comment);
+    await this.commentsRepository.updateComment(content, comment.id);
   }
 }

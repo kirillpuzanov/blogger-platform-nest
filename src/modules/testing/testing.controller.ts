@@ -4,6 +4,15 @@ import { Controller, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
+const SQL_COLLECTIONS = [
+  'posts',
+  'comments',
+  'blogs',
+  'sessions',
+  'likes',
+  'users',
+];
+
 @Controller('testing')
 export class TestingController {
   constructor(
@@ -21,12 +30,12 @@ export class TestingController {
     });
     await Promise.all(promises);
 
-    await this.dataSource.query<void>(`TRUNCATE TABLE users RESTART IDENTITY`);
-    await this.dataSource.query<void>(
-      `TRUNCATE TABLE sessions RESTART IDENTITY`,
+    await this.dataSource.query(
+      `
+      TRUNCATE TABLE ${SQL_COLLECTIONS.join(', ')}
+      RESTART IDENTITY CASCADE;
+    `,
     );
-    await this.dataSource.query<void>(`TRUNCATE TABLE blogs RESTART IDENTITY`);
-    await this.dataSource.query<void>(`TRUNCATE TABLE posts RESTART IDENTITY`);
 
     return {
       status: 'succeeded',

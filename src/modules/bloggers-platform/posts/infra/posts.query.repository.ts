@@ -13,12 +13,14 @@ import {
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { PostSqlDto } from '../domain/dto/post.sql-dto';
+import { LikeQueryRepository } from '../../likes/infra/like.query.repository';
+import { NewestLikes } from '../domain/dto/create-post.domain-dto';
 
 @Injectable()
 export class PostsQueryRepository {
   constructor(
     private blogsQueryRepository: BlogsQueryRepository,
-    //todo private likeQueryRepository: LikeQueryRepository,
+    private likeQueryRepository: LikeQueryRepository,
     @InjectDataSource() protected dataSource: DataSource,
   ) {}
 
@@ -49,7 +51,18 @@ export class PostsQueryRepository {
     );
 
     const totalCount = Number(countResult[0]?.total || 0);
-    const postsView = posts.map((el) => PostViewDto.mapToViewSql(el, {}, []));
+
+    const postsIds = posts.map((el) => el.id);
+    const userLikes = await this.likeQueryRepository.getUserLikes(
+      userId,
+      postsIds,
+    );
+
+    const likesMap = await this.getNewestLikesPosts(postsIds);
+
+    const postsView = posts.map((el) =>
+      PostViewDto.mapToViewSql(el, userLikes, likesMap[el.id]),
+    );
 
     return PaginatedViewDto.mapToView({
       page: pageNumber,
@@ -75,7 +88,15 @@ export class PostsQueryRepository {
       });
     }
 
-    return PostViewDto.mapToViewSql(posts[0], {}, []);
+    const postId = posts[0].id;
+
+    const userLikes = await this.likeQueryRepository.getUserLikes(
+      userId,
+      Array(postId),
+    );
+
+    const likesMap = await this.getNewestLikesPosts(Array(postId));
+    return PostViewDto.mapToViewSql(posts[0], userLikes, likesMap[postId]);
   }
 
   async getPostsByBlog(
@@ -117,8 +138,17 @@ export class PostsQueryRepository {
     );
 
     const totalCount = Number(countResult[0]?.total || 0);
+
+    const postsIds = postsByBlog.map((el) => el.id);
+    const userLikes = await this.likeQueryRepository.getUserLikes(
+      userId,
+      postsIds,
+    );
+
+    const likesMap = await this.getNewestLikesPosts(postsIds);
+
     const postsByBlogView = postsByBlog.map((el) =>
-      PostViewDto.mapToViewSql(el, {}, []),
+      PostViewDto.mapToViewSql(el, userLikes, likesMap[el.id]),
     );
 
     return PaginatedViewDto.mapToView({
@@ -127,6 +157,29 @@ export class PostsQueryRepository {
       items: postsByBlogView,
       size: pageSize,
     });
+  }
+
+  private async getNewestLikesPosts(
+    postsIds: string[],
+  ): Promise<Record<string, NewestLikes[]>> {
+    const newestLikesAllPosts =
+      await this.likeQueryRepository.getNewestLikesForManyPosts(postsIds);
+
+    const likesMap: Record<string, NewestLikes[]> = postsIds.reduce(
+      (acc, el) => ({ ...acc, [el]: [] }),
+      {},
+    );
+    newestLikesAllPosts.forEach((like) => {
+      if (!likesMap[like.parent_id]) {
+        likesMap[like.parent_id] = [];
+      }
+      likesMap[like.parent_id].push({
+        addedAt: like.created_at,
+        userId: like.user_id,
+        login: like.user_login,
+      });
+    });
+    return likesMap;
   }
 }
 

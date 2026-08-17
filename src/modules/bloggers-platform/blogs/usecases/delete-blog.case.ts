@@ -21,8 +21,6 @@ export class DeleteBlogUseCase implements ICommandHandler<DeleteBlogCommand> {
     /** удаляем посты привязанные к этому блогу */
     await this.postsRepository.deleteMany(id);
 
-    // todo
-    // /** удаляем комментарии привязанные постам блога */
-    // await this.commentsRepository.deleteMany(id);
+    await this.commentsRepository.deleteMany(id);
   }
 }

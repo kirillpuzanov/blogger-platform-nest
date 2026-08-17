@@ -11,8 +11,8 @@ export class UsersExternalRepository {
   async getById(id: string): Promise<UserViewDto | null> {
     const users = await this.dataSource.query<UserSqlDto[]>(
       `
-        SELECT *  FROM users
-        WHERE id = $1
+        SELECT * FROM users
+        WHERE id=$1
         LIMIT 1`,
       [id],
     );
