@@ -6,7 +6,7 @@ import {
   DomainExceptionCode,
 } from '../../../../../core/exceptions/domain.exception';
 import { CryptoService } from '../../application/crypto.service';
-import { UserSql } from '../../domain/user.entity';
+import { UserTypeOrm } from '../../domain/user.entity';
 
 export class CreateUserCommand {
   constructor(public dto: CreateUserDto) {}
@@ -46,7 +46,7 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
     const passwordHash = await this.cryptoService.generateHash(password);
 
     /** при создании админом подтверждение не требуется */
-    const user = UserSql.createUser({ login, email, passwordHash }, true);
+    const user = UserTypeOrm.createUser({ login, email, passwordHash }, true);
 
     const userId = await this.usersRepository.createUser(user);
     return userId;

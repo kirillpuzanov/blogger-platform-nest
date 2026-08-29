@@ -7,7 +7,7 @@ import {
 import { CryptoService } from '../application/crypto.service';
 import { RegistrationDto } from '../dto/registration.dto';
 import { EmailService } from '../../../notifications/email.service';
-import { UserSql } from '../domain/user.entity';
+import { UserTypeOrm } from '../domain/user.entity';
 import { MailTemplates } from '../api/view-dto/mail-templates';
 
 export class RegistrationCommand {
@@ -51,7 +51,7 @@ export class RegistrationUseCase implements ICommandHandler<RegistrationCommand>
 
     /** сохраняем пользователя в БД, с флагом неподтвержденной регистрации
      * и мета инф. для последующего подтверждения регистрации */
-    const user = UserSql.createUser({ login, email, passwordHash });
+    const user = UserTypeOrm.createUser({ login, email, passwordHash });
 
     await this.usersRepository.createUser(user);
 

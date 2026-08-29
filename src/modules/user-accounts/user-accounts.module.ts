@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { UsersController } from './users/users.controller';
+import { UsersSaController } from './users/users-sa.controller';
 import { UsersRepository } from './users/infra/users.repository';
 import { UsersQueryRepository } from './users/infra/users.query-repository';
 import { CryptoService } from './users/application/crypto.service';
@@ -23,6 +23,8 @@ import { SessionsQueryRepository } from './users/infra/sessions.query-repository
 import { SessionsRepository } from './users/infra/sessions.repository';
 import { LogoutUseCase } from './users/usecases/logout.case';
 import { RefreshTokenUseCase } from './users/usecases/refreshToken.case';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserTypeOrm } from './users/domain/user.entity';
 
 const useCases = [
   CreateUserUseCase,
@@ -57,10 +59,12 @@ const useCases = [
     //     collection: Session.collectionName,
     //   },
     // ]),
+    TypeOrmModule.forFeature([UserTypeOrm]),
+
     JwtModule.register({}),
     NotificationsModule,
   ],
-  controllers: [UsersController, AuthController, SessionsController],
+  controllers: [UsersSaController, AuthController, SessionsController],
   providers: [
     ...useCases,
     UsersRepository,

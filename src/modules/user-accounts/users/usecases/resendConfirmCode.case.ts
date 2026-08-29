@@ -5,7 +5,7 @@ import {
 } from '../../../../core/exceptions/domain.exception';
 import { UsersRepository } from '../infra/users.repository';
 import { EmailService } from '../../../notifications/email.service';
-import { UserSql } from '../domain/user.entity';
+import { UserTypeOrm } from '../domain/user.entity';
 import { MailTemplates } from '../api/view-dto/mail-templates';
 
 export class ResendConfirmCodeCommand {
@@ -38,7 +38,7 @@ export class ResendConfirmCodeUseCase implements ICommandHandler<ResendConfirmCo
       });
     }
 
-    const confirmationData = UserSql.getNewConfirmationData();
+    const confirmationData = UserTypeOrm.getNewConfirmationData();
 
     await this.usersRepository.updateConfirmationData(
       user.id,
