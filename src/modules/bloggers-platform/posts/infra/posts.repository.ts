@@ -113,17 +113,17 @@ export class PostsRepository {
   }
 
   async updateLikeCount(
-    likesCount: number,
-    dislikesCount: number,
+    likesCountDelta: number,
+    dislikesCountDelta: number,
     postId: string,
   ): Promise<void> {
     return this.dataSource.query<void>(
       `
         UPDATE posts
-        SET likes_count=likes_count +$1, dislikes_count=dislikes_count + $2
+        SET likes_count = likes_count + $1, dislikes_count = dislikes_count + $2
         WHERE id = $3
         `,
-      [likesCount, dislikesCount, postId],
+      [likesCountDelta, dislikesCountDelta, postId],
     );
   }
 }
