@@ -6,12 +6,7 @@ import {
   DomainException,
   DomainExceptionCode,
 } from '../../../../core/exceptions/domain.exception';
-import { InjectModel } from '@nestjs/mongoose';
-import {
-  Comment,
-  type CommentModelType,
-  CommentSql,
-} from '../domain/comment.entity';
+import { CommentSql } from '../domain/comment.entity';
 import { UsersExternalRepository } from '../../../user-accounts/users/infra/users-external.repository';
 
 export class CreateCommentCommand {
@@ -21,7 +16,6 @@ export class CreateCommentCommand {
 @CommandHandler(CreateCommentCommand)
 export class CreateCommentUseCase implements ICommandHandler<CreateCommentCommand> {
   constructor(
-    @InjectModel(Comment.modelName) private CommentModel: CommentModelType,
     private commentsRepository: CommentsRepository,
     private postsRepository: PostsRepository,
     private usersExternalRepository: UsersExternalRepository,
