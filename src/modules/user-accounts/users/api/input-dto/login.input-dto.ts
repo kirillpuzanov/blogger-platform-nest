@@ -1,7 +1,11 @@
 import { IsString, Length } from 'class-validator';
 import { Trim } from '../../../../../core/decorators/transform/trim';
 import { passwordConstraints } from '../../domain/user.entity';
-import { LoginDto } from '../../dto/login.dto';
+
+export class LoginDto {
+  loginOrEmail: string;
+  password: string;
+}
 
 export class LoginInputDto implements LoginDto {
   @IsString()

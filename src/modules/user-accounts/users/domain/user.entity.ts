@@ -1,5 +1,4 @@
 import { randomUUID } from 'crypto';
-import { CreateUserDomainDto } from '../dto/create-user.dto';
 import { UserSqlDto } from './sql-entity-dto/user.sql-dto';
 import { ConfirmationDataDomainDto } from './dto/confirmation-data.domain.dto';
 import {
@@ -8,6 +7,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { CreateUserDomainDto } from './dto/create-user.domain.dto';
 
 export const loginConstraints = {
   minLength: 3,

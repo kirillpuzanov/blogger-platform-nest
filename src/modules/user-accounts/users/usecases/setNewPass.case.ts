@@ -1,11 +1,11 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../infra/users.repository';
-import { NewPasswordDto } from '../dto/new-password.dto';
 import {
   DomainException,
   DomainExceptionCode,
 } from '../../../../core/exceptions/domain.exception';
 import { CryptoService } from '../application/crypto.service';
+import { NewPasswordDto } from '../api/input-dto/new-password.input-dto';
 
 export class SetNewPassCommand {
   constructor(public dto: NewPasswordDto) {}

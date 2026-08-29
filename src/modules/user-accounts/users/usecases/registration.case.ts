@@ -5,10 +5,10 @@ import {
   DomainExceptionCode,
 } from '../../../../core/exceptions/domain.exception';
 import { CryptoService } from '../application/crypto.service';
-import { RegistrationDto } from '../dto/registration.dto';
 import { EmailService } from '../../../notifications/email.service';
 import { UserTypeOrm } from '../domain/user.entity';
 import { MailTemplates } from '../api/view-dto/mail-templates';
+import { RegistrationDto } from '../api/input-dto/registration.input-dto';
 
 export class RegistrationCommand {
   constructor(public dto: RegistrationDto) {}
