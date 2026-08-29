@@ -63,16 +63,16 @@ export class CommentsRepository {
 
   async updateLikeCount(
     commentId: string,
-    likeCount: number,
-    dislikeCount: number,
+    likeCountDelta: number,
+    dislikeCountDelta: number,
   ): Promise<void> {
     return this.dataSource.query<void>(
       `
         UPDATE comments
-        SET likes_count=$1, dislikes_count=$2
+        SET likes_count = likes_count + $1, dislikes_count = dislikes_count + $2
         WHERE id = $3
         `,
-      [likeCount, dislikeCount, commentId],
+      [likeCountDelta, dislikeCountDelta, commentId],
     );
   }
 
