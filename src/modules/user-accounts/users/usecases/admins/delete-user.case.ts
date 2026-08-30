@@ -18,9 +18,9 @@ export class DeleteUserUseCase implements ICommandHandler<DeleteUserCommand> {
   ) {}
 
   async execute({ id }: DeleteUserCommand): Promise<void> {
-    const deletedCount = await this.usersRepository.deleteOne(id);
+    const isDeleted = await this.usersRepository.deleteOne(id);
 
-    if (deletedCount < 1) {
+    if (isDeleted) {
       throw new DomainException({
         code: DomainExceptionCode.NotFound,
         message: 'user is not exists',

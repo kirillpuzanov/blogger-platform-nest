@@ -48,7 +48,7 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
     /** при создании админом подтверждение не требуется */
     const user = UserTypeOrm.createUser({ login, email, passwordHash }, true);
 
-    const userId = await this.usersRepository.createUser(user);
+    const userId = await this.usersRepository.save(user);
     return userId;
   }
 }

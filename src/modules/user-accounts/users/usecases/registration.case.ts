@@ -53,7 +53,7 @@ export class RegistrationUseCase implements ICommandHandler<RegistrationCommand>
      * и мета инф. для последующего подтверждения регистрации */
     const user = UserTypeOrm.createUser({ login, email, passwordHash });
 
-    await this.usersRepository.createUser(user);
+    await this.usersRepository.save(user);
 
     this.emailService
       .sendMail(user.email, MailTemplates.registration(user.confirmation_code!))
