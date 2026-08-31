@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
-import { UsersController } from './users/users.controller';
-import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './users/domain/user.entity';
+import { UsersSaController } from './users/users-sa.controller';
 import { UsersRepository } from './users/infra/users.repository';
 import { UsersQueryRepository } from './users/infra/users.query-repository';
 import { CryptoService } from './users/application/crypto.service';
@@ -20,12 +18,14 @@ import { ResendConfirmCodeUseCase } from './users/usecases/resendConfirmCode.cas
 import { UsersExternalRepository } from './users/infra/users-external.repository';
 import { DeleteUserSessionUseCase } from './users/usecases/sessions/delete-user-session.case';
 import { DeleteUserSessionsUseCase } from './users/usecases/sessions/delete-user-sessions.case';
-import { Session, SessionSchema } from './users/domain/session.entity';
 import { SessionsController } from './users/sessions.controller';
 import { SessionsQueryRepository } from './users/infra/sessions.query-repository';
 import { SessionsRepository } from './users/infra/sessions.repository';
 import { LogoutUseCase } from './users/usecases/logout.case';
 import { RefreshTokenUseCase } from './users/usecases/refreshToken.case';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserTypeOrm } from './users/domain/user.entity';
+import { SessionTypeOrm } from './users/domain/session.entity';
 
 const useCases = [
   CreateUserUseCase,
@@ -46,24 +46,26 @@ const useCases = [
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      {
-        name: User.modelName,
-        schema: UserSchema,
-        collection: User.collectionName,
-      },
-    ]),
-    MongooseModule.forFeature([
-      {
-        name: Session.modelName,
-        schema: SessionSchema,
-        collection: Session.collectionName,
-      },
-    ]),
+    // MongooseModule.forFeature([
+    //   {
+    //     name: User.modelName,
+    //     schema: UserSchema,
+    //     collection: User.collectionName,
+    //   },
+    // ]),
+    // MongooseModule.forFeature([
+    //   {
+    //     name: Session.modelName,
+    //     schema: SessionSchema,
+    //     collection: Session.collectionName,
+    //   },
+    // ]),
+    TypeOrmModule.forFeature([UserTypeOrm, SessionTypeOrm]),
+
     JwtModule.register({}),
     NotificationsModule,
   ],
-  controllers: [UsersController, AuthController, SessionsController],
+  controllers: [UsersSaController, AuthController, SessionsController],
   providers: [
     ...useCases,
     UsersRepository,

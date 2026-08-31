@@ -25,7 +25,7 @@ import { UsersQueryRepository } from './infra/users.query-repository';
 @Controller('sa/users')
 @UseGuards(BasicAuthGuard)
 @ApiBasicAuth('basic_auth')
-export class UsersController {
+export class UsersSaController {
   constructor(
     private usersQueryRepository: UsersQueryRepository,
     private readonly commandBus: CommandBus,

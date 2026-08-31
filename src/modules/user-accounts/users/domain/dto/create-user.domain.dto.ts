@@ -3,9 +3,3 @@ export class CreateUserDomainDto {
   email: string;
   passwordHash: string;
 }
-
-export class CreateUserDto {
-  login: string;
-  email: string;
-  password: string;
-}

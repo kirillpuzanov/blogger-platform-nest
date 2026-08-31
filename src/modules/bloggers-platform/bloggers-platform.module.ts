@@ -1,13 +1,10 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { Blog, BlogSchema } from './blogs/domain/blog.entity';
 import { BlogsController } from './blogs/blogs.controller';
 import { BlogsRepository } from './blogs/infra/blogs.repository';
 import { BlogsQueryRepository } from './blogs/infra/blogs.query.repository';
 import { PostsController } from './posts/posts.controller';
 import { PostsRepository } from './posts/infra/posts.repository';
 import { PostsQueryRepository } from './posts/infra/posts.query.repository';
-import { Post, PostSchema } from './posts/domain/post.entity';
 import { CreateBlogUseCase } from './blogs/usecases/create-blog.case';
 import { UpdateBlogUseCase } from './blogs/usecases/update-blog.case';
 import { DeleteBlogUseCase } from './blogs/usecases/delete-blog.case';
@@ -25,8 +22,6 @@ import { LikeQueryRepository } from './likes/infra/like.query.repository';
 import { CommentsRepository } from './comments/infra/comments.repository';
 import { LikeService } from './likes/like.service';
 import { CreateCommentUseCase } from './comments/usecases/create-comment.case';
-import { Comment, CommentSchema } from './comments/domain/comment.entity';
-import { Like, LikeSchema } from './likes/domain/like.entity';
 import { UserAccountsModule } from '../user-accounts/user-accounts.module';
 import { BlogsSaController } from './blogs/blogs-sa.controller';
 
@@ -48,28 +43,28 @@ const cases = [
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      {
-        name: Blog.modelName,
-        schema: BlogSchema,
-        collection: Blog.collectionName,
-      },
-      {
-        name: Post.modelName,
-        schema: PostSchema,
-        collection: Post.collectionName,
-      },
-      {
-        name: Comment.modelName,
-        schema: CommentSchema,
-        collection: Comment.collectionName,
-      },
-      {
-        name: Like.modelName,
-        schema: LikeSchema,
-        collection: Like.collectionName,
-      },
-    ]),
+    // MongooseModule.forFeature([
+    //   {
+    //     name: Blog.modelName,
+    //     schema: BlogSchema,
+    //     collection: Blog.collectionName,
+    //   },
+    //   {
+    //     name: Post.modelName,
+    //     schema: PostSchema,
+    //     collection: Post.collectionName,
+    //   },
+    //   {
+    //     name: Comment.modelName,
+    //     schema: CommentSchema,
+    //     collection: Comment.collectionName,
+    //   },
+    //   {
+    //     name: Like.modelName,
+    //     schema: LikeSchema,
+    //     collection: Like.collectionName,
+    //   },
+    // ]),
 
     UserAccountsModule,
   ],

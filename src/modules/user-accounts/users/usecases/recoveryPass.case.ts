@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../infra/users.repository';
 import { EmailService } from '../../../notifications/email.service';
 import { MailTemplates } from '../api/view-dto/mail-templates';
-import { UserSql } from '../domain/user.entity';
+import { UserTypeOrm } from '../domain/user.entity';
 
 export class RecoveryPassCommand {
   constructor(public email: string) {}
@@ -23,7 +23,7 @@ export class RecoveryPassUseCase implements ICommandHandler<RecoveryPassCommand>
       return;
     }
 
-    const confirmationData = UserSql.getNewConfirmationData();
+    const confirmationData = UserTypeOrm.getNewConfirmationData();
 
     await this.usersRepository.updateConfirmationData(
       user.id,

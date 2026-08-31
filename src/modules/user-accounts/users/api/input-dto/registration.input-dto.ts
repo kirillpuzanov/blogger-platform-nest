@@ -5,8 +5,13 @@ import {
   loginConstraints,
   passwordConstraints,
 } from '../../domain/user.entity';
-import { RegistrationDto } from '../../dto/registration.dto';
 import { ApiProperty } from '@nestjs/swagger';
+
+export class RegistrationDto {
+  login: string;
+  password: string;
+  email: string;
+}
 
 export class RegistrationInputDto implements RegistrationDto {
   @IsString()

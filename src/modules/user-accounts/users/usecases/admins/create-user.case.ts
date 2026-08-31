@@ -1,12 +1,12 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../infra/users.repository';
-import { CreateUserDto } from '../../dto/create-user.dto';
 import {
   DomainException,
   DomainExceptionCode,
 } from '../../../../../core/exceptions/domain.exception';
 import { CryptoService } from '../../application/crypto.service';
-import { UserSql } from '../../domain/user.entity';
+import { UserTypeOrm } from '../../domain/user.entity';
+import { CreateUserDto } from '../../api/input-dto/create-user.input-dto';
 
 export class CreateUserCommand {
   constructor(public dto: CreateUserDto) {}
@@ -46,9 +46,9 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
     const passwordHash = await this.cryptoService.generateHash(password);
 
     /** при создании админом подтверждение не требуется */
-    const user = UserSql.createUser({ login, email, passwordHash }, true);
+    const user = UserTypeOrm.createUser({ login, email, passwordHash }, true);
 
-    const userId = await this.usersRepository.createUser(user);
+    const userId = await this.usersRepository.save(user);
     return userId;
   }
 }

@@ -1,10 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { JwtInternalService } from '../application/jwt.service';
-import { LogoutDto } from '../dto/logout.dto';
 import { SessionsRepository } from '../infra/sessions.repository';
 
 export class LogoutCommand {
-  constructor(public dto: LogoutDto) {}
+  constructor(public dto: { refreshToken: string }) {}
 }
 
 @CommandHandler(LogoutCommand)

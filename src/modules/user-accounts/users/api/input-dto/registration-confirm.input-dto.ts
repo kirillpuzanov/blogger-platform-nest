@@ -1,6 +1,9 @@
 import { IsString } from 'class-validator';
 import { Trim } from '../../../../../core/decorators/transform/trim';
-import { RegistrationConfirmDto } from '../../dto/registration.dto';
+
+export class RegistrationConfirmDto {
+  code: string;
+}
 
 export class RegistrationConfirmInputDto implements RegistrationConfirmDto {
   @IsString()

@@ -5,10 +5,10 @@ import {
   DomainExceptionCode,
 } from '../../../../core/exceptions/domain.exception';
 import { CryptoService } from '../application/crypto.service';
-import { RegistrationDto } from '../dto/registration.dto';
 import { EmailService } from '../../../notifications/email.service';
-import { UserSql } from '../domain/user.entity';
+import { UserTypeOrm } from '../domain/user.entity';
 import { MailTemplates } from '../api/view-dto/mail-templates';
+import { RegistrationDto } from '../api/input-dto/registration.input-dto';
 
 export class RegistrationCommand {
   constructor(public dto: RegistrationDto) {}
@@ -51,9 +51,9 @@ export class RegistrationUseCase implements ICommandHandler<RegistrationCommand>
 
     /** сохраняем пользователя в БД, с флагом неподтвержденной регистрации
      * и мета инф. для последующего подтверждения регистрации */
-    const user = UserSql.createUser({ login, email, passwordHash });
+    const user = UserTypeOrm.createUser({ login, email, passwordHash });
 
-    await this.usersRepository.createUser(user);
+    await this.usersRepository.save(user);
 
     this.emailService
       .sendMail(user.email, MailTemplates.registration(user.confirmation_code!))

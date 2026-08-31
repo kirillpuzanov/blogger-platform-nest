@@ -1,5 +1,4 @@
-import { UserDocument } from '../../domain/user.entity';
-import { UserSqlDto } from '../../domain/sql-entity-dto/user.sql-dto';
+import { UserTypeOrm } from '../../domain/user.entity';
 
 export class UserViewDto {
   id: string;
@@ -7,18 +6,20 @@ export class UserViewDto {
   email: string;
   createdAt: Date;
 
-  static mapToView(user: UserDocument): UserViewDto {
-    const dto = new UserViewDto();
+  // mongoose
 
-    dto.id = user._id.toString();
-    dto.login = user.login;
-    dto.email = user.email;
-    dto.createdAt = user.createdAt;
+  // static mapToView(user: UserDocument): UserViewDto {
+  //   const dto = new UserViewDto();
+  //
+  //   dto.id = user._id.toString();
+  //   dto.login = user.login;
+  //   dto.email = user.email;
+  //   dto.createdAt = user.createdAt;
+  //
+  //   return dto;
+  // }
 
-    return dto;
-  }
-
-  static mapToViewSql(user: UserSqlDto): UserViewDto {
+  static mapToViewSql(user: UserTypeOrm): UserViewDto {
     const dto = new UserViewDto();
 
     dto.id = user.id;

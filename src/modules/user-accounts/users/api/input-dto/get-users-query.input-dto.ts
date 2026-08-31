@@ -21,7 +21,7 @@ export const sortByUsersQueryAdapter = {
   email: 'email',
 };
 
-export const sortDirectionAdapter = {
+export const sortDirectionAdapter: Record<'asc' | 'desc', 'ASC' | 'DESC'> = {
   asc: 'ASC',
   desc: 'DESC',
 };

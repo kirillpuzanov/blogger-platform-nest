@@ -3,7 +3,6 @@ import { configDynamicModule } from '../config/config-dynamic.module';
 import { DynamicModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { MongooseModule } from '@nestjs/mongoose';
 import { UserAccountsModule } from '../modules/user-accounts/user-accounts.module';
 import { TestingModule } from '../modules/testing/testing.module';
 import { BloggersPlatformModule } from '../modules/bloggers-platform/bloggers-platform.module';
@@ -19,15 +18,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
-    MongooseModule.forRootAsync({
-      useFactory: (coreConfig: CoreConfig) => ({
-        uri: coreConfig.mongoUrl,
-        dbName: coreConfig.dbName,
-      }),
-      inject: [CoreConfig],
-    }),
+    // MongooseModule.forRootAsync({
+    //   inject: [CoreConfig],
+    //   useFactory: (coreConfig: CoreConfig) => ({
+    //     uri: coreConfig.mongoUrl,
+    //     dbName: coreConfig.dbName,
+    //   }),
+    // }),
 
     TypeOrmModule.forRootAsync({
+      inject: [CoreConfig],
       useFactory: (coreConfig: CoreConfig) => ({
         type: 'postgres',
         host: 'localhost',
@@ -36,8 +36,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         database: coreConfig.sqlDbName,
         autoLoadEntities: true,
         synchronize: true,
+        logging: true,
       }),
-      inject: [CoreConfig],
     }),
 
     ThrottlerModule.forRoot([
