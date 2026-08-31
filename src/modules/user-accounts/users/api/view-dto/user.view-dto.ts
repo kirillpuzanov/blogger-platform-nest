@@ -1,10 +1,12 @@
-import { UserSqlDto } from '../../domain/sql-entity-dto/user.sql-dto';
+import { UserTypeOrm } from '../../domain/user.entity';
 
 export class UserViewDto {
   id: string;
   login: string;
   email: string;
   createdAt: Date;
+
+  // mongoose
 
   // static mapToView(user: UserDocument): UserViewDto {
   //   const dto = new UserViewDto();
@@ -17,7 +19,7 @@ export class UserViewDto {
   //   return dto;
   // }
 
-  static mapToViewSql(user: UserSqlDto): UserViewDto {
+  static mapToViewSql(user: UserTypeOrm): UserViewDto {
     const dto = new UserViewDto();
 
     dto.id = user.id;

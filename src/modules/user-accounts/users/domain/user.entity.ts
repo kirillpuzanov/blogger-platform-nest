@@ -1,5 +1,4 @@
 import { randomUUID } from 'crypto';
-import { UserSqlDto } from './sql-entity-dto/user.sql-dto';
 import { ConfirmationDataDomainDto } from './dto/confirmation-data.domain.dto';
 import {
   Column,
@@ -63,7 +62,7 @@ export class UserTypeOrm {
   static createUser(
     dto: CreateUserDomainDto,
     isConfirmed?: boolean,
-  ): UserSqlDto {
+  ): UserTypeOrm {
     const user = new this();
 
     const {

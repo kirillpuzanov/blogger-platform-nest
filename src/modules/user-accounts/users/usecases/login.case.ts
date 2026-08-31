@@ -9,9 +9,9 @@ import { JwtInternalService } from '../application/jwt.service';
 import { randomUUID } from 'crypto';
 import { LoginDomainDto } from '../domain/dto/login.domain.dto';
 import { SessionsRepository } from '../infra/sessions.repository';
-import { UserSqlDto } from '../domain/sql-entity-dto/user.sql-dto';
 import { SessionSql } from '../domain/session.entity';
 import { SessionSqlDto } from '../domain/sql-entity-dto/session.sql-dto';
+import { UserTypeOrm } from '../domain/user.entity';
 
 export type LoginCommandReturn = { accessToken: string; refreshToken: string };
 
@@ -60,7 +60,7 @@ export class LoginUseCase implements ICommandHandler<LoginCommand> {
   private async checkCredentials(
     password: string,
     loginOrEmail: string,
-  ): Promise<UserSqlDto> {
+  ): Promise<UserTypeOrm> {
     const user = await this.usersRepository.getByLoginOrEmail(loginOrEmail);
 
     if (!user) {

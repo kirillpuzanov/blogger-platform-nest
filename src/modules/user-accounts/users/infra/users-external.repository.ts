@@ -1,28 +1,47 @@
 import { Injectable } from '@nestjs/common';
 import { UserViewDto } from '../api/view-dto/user.view-dto';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
-import { UserSqlDto } from '../domain/sql-entity-dto/user.sql-dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { UserTypeOrm } from '../domain/user.entity';
 
 @Injectable()
 export class UsersExternalRepository {
-  constructor(@InjectDataSource() protected dataSource: DataSource) {}
+  constructor(
+    @InjectRepository(UserTypeOrm)
+    private usersRepo: Repository<UserTypeOrm>,
+  ) {}
 
   async getById(id: string): Promise<UserViewDto | null> {
-    const users = await this.dataSource.query<UserSqlDto[]>(
-      `
-        SELECT * FROM users
-        WHERE id=$1
-        LIMIT 1`,
-      [id],
-    );
+    const user = await this.usersRepo.findOneBy({ id: id });
 
-    if (users.length === 0) {
+    if (!user?.id) {
       return null;
     }
-    return UserViewDto.mapToViewSql(users[0]);
+    return UserViewDto.mapToViewSql(user);
   }
 }
+
+// row Sql
+
+// @Injectable()
+// export class UsersExternalRepository {
+//   constructor(@InjectDataSource() protected dataSource: DataSource) {}
+//
+//   async getById(id: string): Promise<UserViewDto | null> {
+//     const users = await this.dataSource.query<UserSqlDto[]>(
+//       `
+//         SELECT * FROM users
+//         WHERE id=$1
+//         LIMIT 1`,
+//       [id],
+//     );
+//
+//     if (users.length === 0) {
+//       return null;
+//     }
+//     return UserViewDto.mapToViewSql(users[0]);
+//   }
+// }
 
 // Mongoose
 // @Injectable()

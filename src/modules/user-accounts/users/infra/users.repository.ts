@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserSqlDto } from '../domain/sql-entity-dto/user.sql-dto';
 import { ConfirmationDataDomainDto } from '../domain/dto/confirmation-data.domain.dto';
 import { UserTypeOrm } from '../domain/user.entity';
 import { UpdateResult } from 'typeorm/query-builder/result/UpdateResult';
@@ -13,7 +12,7 @@ export class UsersRepository {
     private usersRepo: Repository<UserTypeOrm>,
   ) {}
 
-  async save(user: UserSqlDto): Promise<string> {
+  async save(user: UserTypeOrm): Promise<string> {
     const savedUser = await this.usersRepo.save<UserTypeOrm>(user);
     return savedUser.id;
   }
@@ -33,6 +32,18 @@ export class UsersRepository {
   async getByLoginOrEmail(loginOrEmail: string): Promise<UserTypeOrm> {
     return this.usersRepo.findOneOrFail({
       where: [{ login: loginOrEmail }, { email: loginOrEmail }],
+    });
+  }
+
+  async getByConfirmCode(confirmCode: string): Promise<UserTypeOrm> {
+    return this.usersRepo.findOneOrFail({
+      where: [{ confirmation_code: confirmCode }],
+    });
+  }
+
+  async getByRecoveryPassCode(recoveryCode: string): Promise<UserTypeOrm> {
+    return this.usersRepo.findOneOrFail({
+      where: [{ recovery_code: recoveryCode }],
     });
   }
 
@@ -62,18 +73,6 @@ export class UsersRepository {
         confirmation_expiration: confirmationData.confirmation_expiration,
       },
     );
-  }
-
-  async getByConfirmCode(confirmCode: string): Promise<UserSqlDto> {
-    return this.usersRepo.findOneOrFail({
-      where: [{ confirmation_code: confirmCode }],
-    });
-  }
-
-  async getByRecoveryPassCode(recoveryCode: string): Promise<UserSqlDto> {
-    return this.usersRepo.findOneOrFail({
-      where: [{ recovery_code: recoveryCode }],
-    });
   }
 }
 
