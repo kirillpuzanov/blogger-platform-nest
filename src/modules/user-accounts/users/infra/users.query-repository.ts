@@ -45,7 +45,7 @@ export class UsersQueryRepository {
       }
 
       if (searchEmailTerm) {
-        conditions.push('login ILIKE :emailTerm');
+        conditions.push('email ILIKE :emailTerm');
         parameters.emailTerm = `%${searchEmailTerm}%`;
       }
 

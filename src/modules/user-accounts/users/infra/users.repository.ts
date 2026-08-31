@@ -29,20 +29,22 @@ export class UsersRepository {
     });
   }
 
-  async getByLoginOrEmail(loginOrEmail: string): Promise<UserTypeOrm> {
-    return this.usersRepo.findOneOrFail({
+  async getByLoginOrEmail(loginOrEmail: string): Promise<UserTypeOrm | null> {
+    return this.usersRepo.findOne({
       where: [{ login: loginOrEmail }, { email: loginOrEmail }],
     });
   }
 
-  async getByConfirmCode(confirmCode: string): Promise<UserTypeOrm> {
-    return this.usersRepo.findOneOrFail({
+  async getByConfirmCode(confirmCode: string): Promise<UserTypeOrm | null> {
+    return this.usersRepo.findOne({
       where: [{ confirmation_code: confirmCode }],
     });
   }
 
-  async getByRecoveryPassCode(recoveryCode: string): Promise<UserTypeOrm> {
-    return this.usersRepo.findOneOrFail({
+  async getByRecoveryPassCode(
+    recoveryCode: string,
+  ): Promise<UserTypeOrm | null> {
+    return this.usersRepo.findOne({
       where: [{ recovery_code: recoveryCode }],
     });
   }
