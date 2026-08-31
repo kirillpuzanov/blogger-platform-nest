@@ -1,5 +1,4 @@
-import { SessionDocument } from '../../domain/session.entity';
-import { SessionSqlDto } from '../../domain/sql-entity-dto/session.sql-dto';
+import { SessionTypeOrm } from '../../domain/session.entity';
 
 export class SessionViewDto {
   ip: string;
@@ -7,18 +6,18 @@ export class SessionViewDto {
   lastActiveDate: string;
   deviceId: string;
 
-  static mapToView(session: SessionDocument): SessionViewDto {
-    const dto = new SessionViewDto();
+  // static mapToView(session: SessionDocument): SessionViewDto {
+  //   const dto = new SessionViewDto();
+  //
+  //   dto.ip = session.ip;
+  //   dto.title = session.deviceName;
+  //   dto.lastActiveDate = new Date(session.iat).toISOString();
+  //   dto.deviceId = session.deviceId;
+  //
+  //   return dto;
+  // }
 
-    dto.ip = session.ip;
-    dto.title = session.deviceName;
-    dto.lastActiveDate = new Date(session.iat).toISOString();
-    dto.deviceId = session.deviceId;
-
-    return dto;
-  }
-
-  static mapSqlToView(session: SessionSqlDto): SessionViewDto {
+  static mapSqlToView(session: SessionTypeOrm): SessionViewDto {
     const dto = new SessionViewDto();
 
     dto.ip = session.ip;

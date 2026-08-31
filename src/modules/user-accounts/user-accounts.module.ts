@@ -25,6 +25,7 @@ import { LogoutUseCase } from './users/usecases/logout.case';
 import { RefreshTokenUseCase } from './users/usecases/refreshToken.case';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserTypeOrm } from './users/domain/user.entity';
+import { SessionTypeOrm } from './users/domain/session.entity';
 
 const useCases = [
   CreateUserUseCase,
@@ -59,7 +60,7 @@ const useCases = [
     //     collection: Session.collectionName,
     //   },
     // ]),
-    TypeOrmModule.forFeature([UserTypeOrm]),
+    TypeOrmModule.forFeature([UserTypeOrm, SessionTypeOrm]),
 
     JwtModule.register({}),
     NotificationsModule,

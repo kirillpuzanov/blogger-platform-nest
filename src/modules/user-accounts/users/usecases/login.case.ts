@@ -9,8 +9,7 @@ import { JwtInternalService } from '../application/jwt.service';
 import { randomUUID } from 'crypto';
 import { LoginDomainDto } from '../domain/dto/login.domain.dto';
 import { SessionsRepository } from '../infra/sessions.repository';
-import { SessionSql } from '../domain/session.entity';
-import { SessionSqlDto } from '../domain/sql-entity-dto/session.sql-dto';
+import { SessionTypeOrm } from '../domain/session.entity';
 import { UserTypeOrm } from '../domain/user.entity';
 
 export type LoginCommandReturn = { accessToken: string; refreshToken: string };
@@ -44,7 +43,7 @@ export class LoginUseCase implements ICommandHandler<LoginCommand> {
 
     const { exp, iat } = this.jwtService.decodeToken(refreshToken);
 
-    const newSession: SessionSqlDto = SessionSql.createSession({
+    const newSession = SessionTypeOrm.createSession({
       ip,
       exp,
       iat,
@@ -52,7 +51,7 @@ export class LoginUseCase implements ICommandHandler<LoginCommand> {
       deviceId,
       deviceName,
     });
-    await this.sessionsRepository.createSession(newSession);
+    await this.sessionsRepository.save(newSession);
 
     return { accessToken, refreshToken };
   }

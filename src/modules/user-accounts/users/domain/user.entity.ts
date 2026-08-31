@@ -4,9 +4,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { CreateUserDomainDto } from './dto/create-user.domain.dto';
+import { SessionTypeOrm } from './session.entity';
 
 export const loginConstraints = {
   minLength: 3,
@@ -58,6 +60,11 @@ export class UserTypeOrm {
 
   @Column({ type: 'timestamp', nullable: true })
   recovery_sent_code?: Date | null = null;
+
+  /** создаем связь пользователя с его сессиями */
+  /** у одного пользователя несколько сессий - OneToMany */
+  @OneToMany(() => SessionTypeOrm, (session) => session.user)
+  sessions: SessionTypeOrm[];
 
   static createUser(
     dto: CreateUserDomainDto,
