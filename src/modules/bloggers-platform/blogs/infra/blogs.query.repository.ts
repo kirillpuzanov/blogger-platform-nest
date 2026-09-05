@@ -11,7 +11,7 @@ import {
 } from '../../../../core/exceptions/domain.exception';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { BlogSqlDto } from '../domain/dto/blog.sql-dto';
+import { BlogTypeOrm } from '../domain/blog.entity';
 
 @Injectable()
 export class BlogsQueryRepository {
@@ -49,7 +49,7 @@ export class BlogsQueryRepository {
     LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
   `;
 
-    const blogs = await this.dataSource.query<BlogSqlDto[]>(queryText, [
+    const blogs = await this.dataSource.query<BlogTypeOrm[]>(queryText, [
       ...parameters,
       pageSize,
       offset,
@@ -78,7 +78,7 @@ export class BlogsQueryRepository {
   }
 
   async getByIdOrFail(id: string): Promise<BlogViewDto> {
-    const blogs = await this.dataSource.query<BlogSqlDto[]>(
+    const blogs = await this.dataSource.query<BlogTypeOrm[]>(
       `SELECT * FROM blogs WHERE id=$1`,
       [id],
     );
@@ -134,7 +134,7 @@ export class BlogsQueryRepository {
 //     LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
 //   `;
 //
-//     const blogs = await this.dataSource.query<BlogSqlDto[]>(queryText, [
+//     const blogs = await this.dataSource.query<BlogTypeOrm[]>(queryText, [
 //       ...parameters,
 //       pageSize,
 //       offset,
@@ -163,7 +163,7 @@ export class BlogsQueryRepository {
 //   }
 //
 //   async getByIdOrFail(id: string): Promise<BlogViewDto> {
-//     const blogs = await this.dataSource.query<BlogSqlDto[]>(
+//     const blogs = await this.dataSource.query<BlogTypeOrm[]>(
 //       `SELECT * FROM blogs WHERE id=$1`,
 //       [id],
 //     );

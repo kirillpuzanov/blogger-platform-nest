@@ -36,10 +36,10 @@ export class BlogTypeOrm implements BlogSqlDto {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', nullable: false, length: '15' })
+  @Column({ type: 'varchar', nullable: false, length: 15 })
   name: string;
 
-  @Column({ type: 'text', nullable: false, length: '500' })
+  @Column({ type: 'varchar', nullable: false, length: 500 })
   description: string;
 
   @Column({ type: 'varchar', nullable: false })
@@ -65,26 +65,29 @@ export class BlogTypeOrm implements BlogSqlDto {
     this.name = dto.name;
     this.description = dto.description;
     this.website_url = dto.websiteUrl;
+
+    return this;
   }
 }
 
-export class BlogSql implements BlogSqlDto {
-  id: string;
-  name: string;
-  description: string;
-  website_url: string;
-  created_at: Date;
-  is_membership: boolean;
-
-  static createBlog(dto: CreateBlogDto): BlogSqlDto {
-    const blog = new this();
-    blog.name = dto.name;
-    blog.description = dto.description;
-    blog.website_url = dto.websiteUrl;
-    blog.is_membership = false;
-    return blog;
-  }
-}
+// Row Sql
+// export class BlogSql implements BlogSqlDto {
+//   id: string;
+//   name: string;
+//   description: string;
+//   website_url: string;
+//   created_at: Date;
+//   is_membership: boolean;
+//
+//   static createBlog(dto: CreateBlogDto): BlogSqlDto {
+//     const blog = new this();
+//     blog.name = dto.name;
+//     blog.description = dto.description;
+//     blog.website_url = dto.websiteUrl;
+//     blog.is_membership = false;
+//     return blog;
+//   }
+// }
 
 // mongoose
 //
