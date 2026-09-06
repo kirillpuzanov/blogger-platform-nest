@@ -21,22 +21,24 @@ export class SessionTypeOrm {
 
   @Column({ type: 'varchar', nullable: false })
   device_name: string;
+
   @Column({ type: 'varchar', nullable: false })
   ip: string;
 
   @Column({ type: 'timestamp', nullable: false })
   iat: Date;
+
   @Column({ type: 'timestamp', nullable: false })
   exp: Date;
-
-  @Column({ type: 'varchar', nullable: false })
-  user_id: string;
 
   /** создаем связь с пользователем */
   /** несколько сессий у одного пользователя - ManyToOne */
   @ManyToOne(() => UserTypeOrm, (user) => user.sessions)
   @JoinColumn({ name: 'user_id' })
   user: UserTypeOrm;
+
+  @Column({ type: 'varchar', nullable: false })
+  user_id: string;
 
   static createSession(dto: CreateSessionDomainDto): SessionTypeOrm {
     const session = new this();

@@ -2,7 +2,6 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BlogsRepository } from '../infra/blogs.repository';
 import { CreateBlogInputDto } from '../api/input-dto/create-blog.input-dto';
 import { PostsRepository } from '../../posts/infra/posts.repository';
-import { BlogSql } from '../domain/blog.entity';
 
 export class UpdateBlogCommand {
   constructor(
@@ -22,13 +21,13 @@ export class UpdateBlogUseCase implements ICommandHandler<UpdateBlogCommand> {
     const blog = await this.blogsRepository.findByIdOrFail(id);
     const oldBlogName = blog.name;
 
-    const updatedBlog = BlogSql.createBlog({
+    const updatedBlog = blog.updateBlog({
       name: dto.name,
       description: dto.description,
       websiteUrl: dto.websiteUrl,
     });
 
-    await this.blogsRepository.updateBlog(updatedBlog, id);
+    await this.blogsRepository.save(updatedBlog);
 
     if (oldBlogName !== dto.name) {
       /** обновим имя блога в привязанных к нему постах */

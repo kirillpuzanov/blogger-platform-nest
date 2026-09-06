@@ -13,7 +13,7 @@ export class LikeQueryRepository {
     userId: string | undefined,
     entityIds: string[],
   ): Promise<Record<string, LikeStatus>> {
-    const myLikes = {} as Record<string, LikeStatus>;
+    const userLikes = {} as Record<string, LikeStatus>;
 
     if (userId) {
       const userLikes = await this.dataSource.query<LikeSqlDto[]>(
@@ -26,12 +26,12 @@ export class LikeQueryRepository {
 
       if (userLikes.length > 0) {
         userLikes.forEach((el) => {
-          myLikes[el.parent_id] = el.status;
+          userLikes[el.parent_id] = el.status;
         });
       }
     }
 
-    return myLikes;
+    return userLikes;
   }
 
   async getNewestLikesForManyPosts(

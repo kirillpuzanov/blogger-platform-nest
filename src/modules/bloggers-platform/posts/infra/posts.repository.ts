@@ -3,75 +3,24 @@ import {
   DomainException,
   DomainExceptionCode,
 } from '../../../../core/exceptions/domain.exception';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
-import { QueryResult } from 'pg';
-import { PostSqlDto } from '../domain/dto/post.sql-dto';
-import { UpdatePostSqlDomainDto } from '../domain/dto/update-post.domain-dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { PostTypeOrm } from '../domain/post.entity';
 
 @Injectable()
 export class PostsRepository {
-  constructor(@InjectDataSource() protected dataSource: DataSource) {}
+  constructor(
+    @InjectRepository(PostTypeOrm)
+    private postsRepo: Repository<PostTypeOrm>,
+  ) {}
 
-  async createPost(post: PostSqlDto) {
-    const {
-      title,
-      short_description,
-      content,
-      blog_id,
-      blog_name,
-      likes_count,
-      dislikes_count,
-    } = post;
-    const result = await this.dataSource.query<[{ id: string }]>(
-      `
-      INSERT INTO posts (
-        title,
-        short_description,
-        content,
-        blog_id,
-        blog_name,
-        likes_count,
-        dislikes_count
-       )
-      VALUES ($1, $2,$3, $4, $5, $6, $7)
-      RETURNING id
-    `,
-      [
-        title,
-        short_description,
-        content,
-        blog_id,
-        blog_name,
-        likes_count,
-        dislikes_count,
-      ],
-    );
-
-    return result[0].id;
+  async save(post: PostTypeOrm) {
+    const result = await this.postsRepo.save(post);
+    return result.id;
   }
 
-  async updatePost(
-    post: UpdatePostSqlDomainDto,
-    postId: string,
-  ): Promise<void> {
-    const { title, content, short_description } = post;
-    return this.dataSource.query<void>(
-      `
-        UPDATE posts
-        SET title=$1, content=$2, short_description=$3
-        WHERE id = $4
-        `,
-      [title, content, short_description, postId],
-    );
-  }
-
-  async findByIdOrFail(id: string): Promise<PostSqlDto> {
-    const result = await this.dataSource.query<PostSqlDto[]>(
-      `SELECT * FROM posts WHERE id=$1`,
-      [id],
-    );
-    const post = result[0];
+  async findByIdOrFail(id: string): Promise<PostTypeOrm> {
+    const post = await this.postsRepo.findOneBy({ id: id });
 
     if (!post) {
       throw new DomainException({
@@ -83,47 +32,142 @@ export class PostsRepository {
   }
 
   async deleteById(id: string): Promise<void> {
-    await this.dataSource.query<number[]>(
-      `
-      DELETE FROM posts
-      WHERE id=$1`,
-      [id],
-    );
+    const result = await this.postsRepo.delete({ id: id });
+
+    if (!result.affected) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'post not found',
+      });
+    }
   }
 
   async deleteMany(id: string): Promise<void> {
-    await this.dataSource.query<QueryResult>(
-      `
-    DELETE from posts
-    WHERE blog_id=$1
-    `,
-      [id],
-    );
+    await this.postsRepo.delete({ blog_id: id });
   }
 
   async updateBlogName(blogId: string, blogName: string): Promise<void> {
-    return this.dataSource.query<void>(
-      `
-        UPDATE posts
-        SET blog_name=$1
-        WHERE blog_id=$2
-        `,
-      [blogName, blogId],
-    );
-  }
-
-  async updateLikeCount(
-    likesCountDelta: number,
-    dislikesCountDelta: number,
-    postId: string,
-  ): Promise<void> {
-    return this.dataSource.query<void>(
-      `
-        UPDATE posts
-        SET likes_count = likes_count + $1, dislikes_count = dislikes_count + $2
-        WHERE id = $3
-        `,
-      [likesCountDelta, dislikesCountDelta, postId],
-    );
+    await this.postsRepo.update({ blog_id: blogId }, { blog_name: blogName });
   }
 }
+
+// Row Sql
+
+// @Injectable()
+// export class PostsRepository {
+//   constructor(@InjectDataSource() protected dataSource: DataSource) {}
+//
+//   async createPost(post: PostSqlDto) {
+//     const {
+//       title,
+//       short_description,
+//       content,
+//       blog_id,
+//       blog_name,
+//       likes_count,
+//       dislikes_count,
+//     } = post;
+//     const result = await this.dataSource.query<[{ id: string }]>(
+//       `
+//       INSERT INTO posts (
+//         title,
+//         short_description,
+//         content,
+//         blog_id,
+//         blog_name,
+//         likes_count,
+//         dislikes_count
+//        )
+//       VALUES ($1, $2,$3, $4, $5, $6, $7)
+//       RETURNING id
+//     `,
+//       [
+//         title,
+//         short_description,
+//         content,
+//         blog_id,
+//         blog_name,
+//         likes_count,
+//         dislikes_count,
+//       ],
+//     );
+//
+//     return result[0].id;
+//   }
+//
+//   async updatePost(
+//     post: UpdatePostSqlDomainDto,
+//     postId: string,
+//   ): Promise<void> {
+//     const { title, content, short_description } = post;
+//     return this.dataSource.query<void>(
+//       `
+//         UPDATE posts
+//         SET title=$1, content=$2, short_description=$3
+//         WHERE id = $4
+//         `,
+//       [title, content, short_description, postId],
+//     );
+//   }
+//
+//   async findByIdOrFail(id: string): Promise<PostSqlDto> {
+//     const result = await this.dataSource.query<PostSqlDto[]>(
+//       `SELECT * FROM posts WHERE id=$1`,
+//       [id],
+//     );
+//     const post = result[0];
+//
+//     if (!post) {
+//       throw new DomainException({
+//         code: DomainExceptionCode.NotFound,
+//         message: 'post not found',
+//       });
+//     }
+//     return post;
+//   }
+//
+//   async deleteById(id: string): Promise<void> {
+//     await this.dataSource.query<number[]>(
+//       `
+//       DELETE FROM posts
+//       WHERE id=$1`,
+//       [id],
+//     );
+//   }
+//
+//   async deleteMany(id: string): Promise<void> {
+//     await this.dataSource.query<QueryResult>(
+//       `
+//     DELETE from posts
+//     WHERE blog_id=$1
+//     `,
+//       [id],
+//     );
+//   }
+//
+//   async updateBlogName(blogId: string, blogName: string): Promise<void> {
+//     return this.dataSource.query<void>(
+//       `
+//         UPDATE posts
+//         SET blog_name=$1
+//         WHERE blog_id=$2
+//         `,
+//       [blogName, blogId],
+//     );
+//   }
+//
+//   async updateLikeCount(
+//     likesCountDelta: number,
+//     dislikesCountDelta: number,
+//     postId: string,
+//   ): Promise<void> {
+//     return this.dataSource.query<void>(
+//       `
+//         UPDATE posts
+//         SET likes_count = likes_count + $1, dislikes_count = dislikes_count + $2
+//         WHERE id = $3
+//         `,
+//       [likesCountDelta, dislikesCountDelta, postId],
+//     );
+//   }
+// }

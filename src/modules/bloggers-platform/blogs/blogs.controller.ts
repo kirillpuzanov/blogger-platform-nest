@@ -14,7 +14,6 @@ import { BlogViewDto } from './api/view-dto/blog.view-dto';
 import { PostsQueryRepository } from '../posts/infra/posts.query.repository';
 import { GetPostsQueryInputDto } from '../posts/api/input-dto/get-posts-query.input-dto';
 import { ObjectIdValidationPipe } from '../../../core/pipes/object-id-validation.pipe';
-import { CommandBus } from '@nestjs/cqrs';
 import { OptionalAccessAuthGuard } from '../../user-accounts/users/guards/optional-access-auth.guard';
 import { ExtractUserFromRequest } from '../../../core/decorators/extract-user-from-request.decorator';
 
@@ -23,7 +22,6 @@ export class BlogsController {
   constructor(
     private blogsQueryRepository: BlogsQueryRepository,
     private postsQueryRepository: PostsQueryRepository,
-    private readonly commandBus: CommandBus,
   ) {}
 
   @Get()

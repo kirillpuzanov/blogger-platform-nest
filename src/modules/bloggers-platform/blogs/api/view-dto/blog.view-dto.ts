@@ -1,5 +1,4 @@
-import { BlogDocument } from '../../domain/blog.entity';
-import { BlogSqlDto } from '../../domain/dto/blog.sql-dto';
+import { BlogTypeOrm } from '../../domain/blog.entity';
 
 export class BlogViewDto {
   id: string;
@@ -9,20 +8,21 @@ export class BlogViewDto {
   createdAt: Date;
   isMembership: boolean;
 
-  static mapToView(blog: BlogDocument): BlogViewDto {
-    const dto = new BlogViewDto();
+  // Mongoose
+  // static mapToView(blog: BlogDocument): BlogViewDto {
+  //   const dto = new BlogViewDto();
+  //
+  //   dto.id = blog._id.toString();
+  //   dto.name = blog.name;
+  //   dto.description = blog.description;
+  //   dto.websiteUrl = blog.websiteUrl;
+  //   dto.createdAt = blog.createdAt;
+  //   dto.isMembership = blog.isMembership;
+  //
+  //   return dto;
+  // }
 
-    dto.id = blog._id.toString();
-    dto.name = blog.name;
-    dto.description = blog.description;
-    dto.websiteUrl = blog.websiteUrl;
-    dto.createdAt = blog.createdAt;
-    dto.isMembership = blog.isMembership;
-
-    return dto;
-  }
-
-  static mapToViewSql(blog: BlogSqlDto): BlogViewDto {
+  static mapToViewSql(blog: BlogTypeOrm): BlogViewDto {
     const dto = new BlogViewDto();
 
     dto.id = blog.id;

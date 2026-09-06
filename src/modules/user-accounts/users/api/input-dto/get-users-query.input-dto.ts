@@ -20,8 +20,3 @@ export const sortByUsersQueryAdapter = {
   login: 'login',
   email: 'email',
 };
-
-export const sortDirectionAdapter: Record<'asc' | 'desc', 'ASC' | 'DESC'> = {
-  asc: 'ASC',
-  desc: 'DESC',
-};

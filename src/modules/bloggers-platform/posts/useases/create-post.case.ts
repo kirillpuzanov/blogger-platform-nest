@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { BlogsQueryRepository } from '../../blogs/infra/blogs.query.repository';
 import { PostsRepository } from '../infra/posts.repository';
-import { PostSql } from '../domain/post.entity';
+import { PostTypeOrm } from '../domain/post.entity';
 
 export class CreatePostCommand {
   constructor(public dto: CreatePostDto) {}
@@ -18,7 +18,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
   async execute({ dto }: CreatePostCommand): Promise<string> {
     const { content, shortDescription, title, blogId } = dto;
     const blog = await this.blogsQueryRepository.getByIdOrFail(blogId);
-    const newPost = PostSql.createPost({
+    const newPost = PostTypeOrm.createPost({
       blogId,
       content,
       shortDescription,
@@ -28,7 +28,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
       dislikesCount: 0,
     });
 
-    const newPostId = await this.postsRepository.createPost(newPost);
+    const newPostId = await this.postsRepository.save(newPost);
     return newPostId;
   }
 }

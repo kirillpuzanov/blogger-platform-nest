@@ -1,6 +1,7 @@
 import {
   ArgumentsHost,
   Catch,
+  ConsoleLogger,
   ExceptionFilter,
   HttpStatus,
 } from '@nestjs/common';
@@ -12,6 +13,8 @@ import { CoreConfig } from '../../../config/core.config';
 /** обработчик 500-х ошибок */
 @Catch()
 export class AllHttpExceptionsFilter implements ExceptionFilter {
+  private readonly logger = new ConsoleLogger('Unhandled-Exception');
+
   constructor(private coreConfig: CoreConfig) {}
 
   catch(exception: Error, host: ArgumentsHost): void {
@@ -37,6 +40,11 @@ export class AllHttpExceptionsFilter implements ExceptionFilter {
         errorsMessages: [],
       };
     }
+
+    this.logger.fatal('Fatal Error', {
+      path: requestUrl,
+      message,
+    });
 
     return {
       timestamp: new Date().toISOString(),

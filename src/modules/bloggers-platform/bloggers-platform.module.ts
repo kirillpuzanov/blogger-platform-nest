@@ -24,6 +24,9 @@ import { LikeService } from './likes/like.service';
 import { CreateCommentUseCase } from './comments/usecases/create-comment.case';
 import { UserAccountsModule } from '../user-accounts/user-accounts.module';
 import { BlogsSaController } from './blogs/blogs-sa.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { BlogTypeOrm } from './blogs/domain/blog.entity';
+import { PostTypeOrm } from './posts/domain/post.entity';
 
 const cases = [
   CreateBlogUseCase,
@@ -65,6 +68,7 @@ const cases = [
     //     collection: Like.collectionName,
     //   },
     // ]),
+    TypeOrmModule.forFeature([BlogTypeOrm, PostTypeOrm]),
 
     UserAccountsModule,
   ],
