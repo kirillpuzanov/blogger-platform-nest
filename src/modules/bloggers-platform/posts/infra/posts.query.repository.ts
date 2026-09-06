@@ -3,25 +3,29 @@ import {
   GetPostsQueryInputDto,
   sortByPostsQueryAdapter,
 } from '../api/input-dto/get-posts-query.input-dto';
-import { PaginatedViewDto } from '../../../../core/dto/base-paginated.view-dto';
+import {
+  PaginatedViewDto,
+  sortDirectionAdapter,
+} from '../../../../core/dto/base-paginated.view-dto';
 import { PostViewDto } from '../api/view-dto/post.view-dto';
 import { BlogsQueryRepository } from '../../blogs/infra/blogs.query.repository';
 import {
   DomainException,
   DomainExceptionCode,
 } from '../../../../core/exceptions/domain.exception';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
-import { PostSqlDto } from '../domain/dto/post.sql-dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { LikeQueryRepository } from '../../likes/infra/like.query.repository';
 import { NewestLikes } from '../domain/dto/create-post.domain-dto';
+import { PostTypeOrm } from '../domain/post.entity';
 
 @Injectable()
 export class PostsQueryRepository {
   constructor(
     private blogsQueryRepository: BlogsQueryRepository,
     private likeQueryRepository: LikeQueryRepository,
-    @InjectDataSource() protected dataSource: DataSource,
+    @InjectRepository(PostTypeOrm)
+    private postsRepo: Repository<PostTypeOrm>,
   ) {}
 
   async getAll(
@@ -29,28 +33,20 @@ export class PostsQueryRepository {
     userId: string | undefined,
   ): Promise<PaginatedViewDto<PostViewDto[]>> {
     const { pageNumber, pageSize, sortBy, sortDirection } = query;
-
-    const offset = query.calculateSkip();
+    const qb = this.postsRepo.createQueryBuilder('posts');
 
     const sortByExpression =
       sortByPostsQueryAdapter[sortBy] === 'created_at'
         ? sortByPostsQueryAdapter[sortBy]
         : `${sortByPostsQueryAdapter[sortBy]} COLLATE "C"`;
 
-    const posts = await this.dataSource.query<PostSqlDto[]>(
-      `
-      SELECT * FROM posts
-      ORDER BY ${sortByExpression} ${sortDirection}
-      LIMIT $1 OFFSET $2
-    `,
-      [pageSize, offset],
-    );
+    /** например: login COLLATE "C" ASC */
+    qb.orderBy(sortByExpression, sortDirectionAdapter[sortDirection]);
 
-    const countResult = await this.dataSource.query<[{ total: string }]>(
-      `SELECT COUNT(*) as total FROM posts`,
-    );
+    /** порция страницы / пропуск */
+    qb.take(pageSize).skip(query.calculateSkip());
 
-    const totalCount = Number(countResult[0]?.total || 0);
+    const [posts, totalCount] = await qb.getManyAndCount();
 
     const postsIds = posts.map((el) => el.id);
     const userLikes = await this.likeQueryRepository.getUserLikes(
@@ -76,27 +72,21 @@ export class PostsQueryRepository {
     id: string,
     userId: string | undefined,
   ): Promise<PostViewDto> {
-    const posts = await this.dataSource.query<PostSqlDto[]>(
-      `SELECT * FROM posts WHERE id=$1`,
-      [id],
-    );
+    const post = await this.postsRepo.findOneBy({ id: id });
 
-    if (!posts[0]) {
+    if (!post) {
       throw new DomainException({
         code: DomainExceptionCode.NotFound,
         message: 'post not found',
       });
     }
-
-    const postId = posts[0].id;
-
     const userLikes = await this.likeQueryRepository.getUserLikes(
       userId,
-      Array(postId),
+      Array(post.id),
     );
 
-    const likesMap = await this.getNewestLikesPosts(Array(postId));
-    return PostViewDto.mapToViewSql(posts[0], userLikes, likesMap[postId]);
+    const likesMap = await this.getNewestLikesPosts(Array(post.id));
+    return PostViewDto.mapToViewSql(post, userLikes, likesMap[post.id]);
   }
 
   async getPostsByBlog(
@@ -106,40 +96,25 @@ export class PostsQueryRepository {
   ): Promise<PaginatedViewDto<PostViewDto[]>> {
     const { pageNumber, pageSize, sortBy, sortDirection } = query;
 
-    const blog = await this.blogsQueryRepository.getByIdOrFail(blogId);
+    // проверка внутри
+    await this.blogsQueryRepository.getByIdOrFail(blogId);
 
-    if (!blog) {
-      throw new DomainException({
-        code: DomainExceptionCode.NotFound,
-        message: 'blog does not exists',
-      });
-    }
-
-    const offset = query.calculateSkip();
+    const qb = this.postsRepo.createQueryBuilder('posts');
 
     const sortByExpression =
       sortByPostsQueryAdapter[sortBy] === 'created_at'
         ? sortByPostsQueryAdapter[sortBy]
         : `${sortByPostsQueryAdapter[sortBy]} COLLATE "C"`;
 
-    const postsByBlog = await this.dataSource.query<PostSqlDto[]>(
-      `
-      SELECT * FROM posts
-      WHERE blog_id=$1
-      ORDER BY ${sortByExpression} ${sortDirection}
-      LIMIT $2 OFFSET $3
-    `,
-      [blogId, pageSize, offset],
-    );
+    qb.orderBy(sortByExpression, sortDirectionAdapter[sortDirection]);
 
-    const countResult = await this.dataSource.query<[{ total: string }]>(
-      `SELECT COUNT(*) as total FROM posts WHERE blog_id=$1`,
-      [blogId],
-    );
+    /** пагинация */
+    qb.skip(query.calculateSkip()).take(pageSize);
 
-    const totalCount = Number(countResult[0]?.total || 0);
+    const [postsByBlog, totalCount] = await qb.getManyAndCount();
 
     const postsIds = postsByBlog.map((el) => el.id);
+
     const userLikes = await this.likeQueryRepository.getUserLikes(
       userId,
       postsIds,
@@ -182,6 +157,175 @@ export class PostsQueryRepository {
     return likesMap;
   }
 }
+
+// Row Sql
+
+// @Injectable()
+// export class PostsQueryRepository {
+//   constructor(
+//     private blogsQueryRepository: BlogsQueryRepository,
+//     private likeQueryRepository: LikeQueryRepository,
+//     @InjectDataSource() protected dataSource: DataSource,
+//   ) {}
+//
+//   async getAll(
+//     query: GetPostsQueryInputDto,
+//     userId: string | undefined,
+//   ): Promise<PaginatedViewDto<PostViewDto[]>> {
+//     const { pageNumber, pageSize, sortBy, sortDirection } = query;
+//
+//     const offset = query.calculateSkip();
+//
+//     const sortByExpression =
+//       sortByPostsQueryAdapter[sortBy] === 'created_at'
+//         ? sortByPostsQueryAdapter[sortBy]
+//         : `${sortByPostsQueryAdapter[sortBy]} COLLATE "C"`;
+//
+//     const posts = await this.dataSource.query<PostSqlDto[]>(
+//       `
+//       SELECT * FROM posts
+//       ORDER BY ${sortByExpression} ${sortDirection}
+//       LIMIT $1 OFFSET $2
+//     `,
+//       [pageSize, offset],
+//     );
+//
+//     const countResult = await this.dataSource.query<[{ total: string }]>(
+//       `SELECT COUNT(*) as total FROM posts`,
+//     );
+//
+//     const totalCount = Number(countResult[0]?.total || 0);
+//
+//     const postsIds = posts.map((el) => el.id);
+//     const userLikes = await this.likeQueryRepository.getUserLikes(
+//       userId,
+//       postsIds,
+//     );
+//
+//     const likesMap = await this.getNewestLikesPosts(postsIds);
+//
+//     const postsView = posts.map((el) =>
+//       PostViewDto.mapToViewSql(el, userLikes, likesMap[el.id]),
+//     );
+//
+//     return PaginatedViewDto.mapToView({
+//       page: pageNumber,
+//       totalCount,
+//       items: postsView,
+//       size: pageSize,
+//     });
+//   }
+//
+//   async getByIdOrFail(
+//     id: string,
+//     userId: string | undefined,
+//   ): Promise<PostViewDto> {
+//     const posts = await this.dataSource.query<PostSqlDto[]>(
+//       `SELECT * FROM posts WHERE id=$1`,
+//       [id],
+//     );
+//
+//     if (!posts[0]) {
+//       throw new DomainException({
+//         code: DomainExceptionCode.NotFound,
+//         message: 'post not found',
+//       });
+//     }
+//
+//     const postId = posts[0].id;
+//
+//     const userLikes = await this.likeQueryRepository.getUserLikes(
+//       userId,
+//       Array(postId),
+//     );
+//
+//     const likesMap = await this.getNewestLikesPosts(Array(postId));
+//     return PostViewDto.mapToViewSql(posts[0], userLikes, likesMap[postId]);
+//   }
+//
+//   async getPostsByBlog(
+//     blogId: string,
+//     query: GetPostsQueryInputDto,
+//     userId: string | undefined,
+//   ): Promise<PaginatedViewDto<PostViewDto[]>> {
+//     const { pageNumber, pageSize, sortBy, sortDirection } = query;
+//
+//     const blog = await this.blogsQueryRepository.getByIdOrFail(blogId);
+//
+//     if (!blog) {
+//       throw new DomainException({
+//         code: DomainExceptionCode.NotFound,
+//         message: 'blog does not exists',
+//       });
+//     }
+//
+//     const offset = query.calculateSkip();
+//
+//     const sortByExpression =
+//       sortByPostsQueryAdapter[sortBy] === 'created_at'
+//         ? sortByPostsQueryAdapter[sortBy]
+//         : `${sortByPostsQueryAdapter[sortBy]} COLLATE "C"`;
+//
+//     const postsByBlog = await this.dataSource.query<PostSqlDto[]>(
+//       `
+//       SELECT * FROM posts
+//       WHERE blog_id=$1
+//       ORDER BY ${sortByExpression} ${sortDirection}
+//       LIMIT $2 OFFSET $3
+//     `,
+//       [blogId, pageSize, offset],
+//     );
+//
+//     const countResult = await this.dataSource.query<[{ total: string }]>(
+//       `SELECT COUNT(*) as total FROM posts WHERE blog_id=$1`,
+//       [blogId],
+//     );
+//
+//     const totalCount = Number(countResult[0]?.total || 0);
+//
+//     const postsIds = postsByBlog.map((el) => el.id);
+//     const userLikes = await this.likeQueryRepository.getUserLikes(
+//       userId,
+//       postsIds,
+//     );
+//
+//     const likesMap = await this.getNewestLikesPosts(postsIds);
+//
+//     const postsByBlogView = postsByBlog.map((el) =>
+//       PostViewDto.mapToViewSql(el, userLikes, likesMap[el.id]),
+//     );
+//
+//     return PaginatedViewDto.mapToView({
+//       page: pageNumber,
+//       totalCount,
+//       items: postsByBlogView,
+//       size: pageSize,
+//     });
+//   }
+//
+//   private async getNewestLikesPosts(
+//     postsIds: string[],
+//   ): Promise<Record<string, NewestLikes[]>> {
+//     const newestLikesAllPosts =
+//       await this.likeQueryRepository.getNewestLikesForManyPosts(postsIds);
+//
+//     const likesMap: Record<string, NewestLikes[]> = postsIds.reduce(
+//       (acc, el) => ({ ...acc, [el]: [] }),
+//       {},
+//     );
+//     newestLikesAllPosts.forEach((like) => {
+//       if (!likesMap[like.parent_id]) {
+//         likesMap[like.parent_id] = [];
+//       }
+//       likesMap[like.parent_id].push({
+//         addedAt: like.created_at,
+//         userId: like.user_id,
+//         login: like.user_login,
+//       });
+//     });
+//     return likesMap;
+//   }
+// }
 
 // Mongoose
 // @Injectable()

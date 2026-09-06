@@ -3,9 +3,11 @@ import { UserViewDto } from '../api/view-dto/user.view-dto';
 import {
   GetUsersQueryInputDto,
   sortByUsersQueryAdapter,
-  sortDirectionAdapter,
 } from '../api/input-dto/get-users-query.input-dto';
-import { PaginatedViewDto } from '../../../../core/dto/base-paginated.view-dto';
+import {
+  PaginatedViewDto,
+  sortDirectionAdapter,
+} from '../../../../core/dto/base-paginated.view-dto';
 import {
   DomainException,
   DomainExceptionCode,

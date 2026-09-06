@@ -2,9 +2,11 @@ import { Injectable } from '@nestjs/common';
 import {
   GetBlogsQueryInputDto,
   sortByBlogsQueryAdapter,
-  sortDirectionAdapter,
 } from '../api/input-dto/get-blogs-query.input-dto';
-import { PaginatedViewDto } from '../../../../core/dto/base-paginated.view-dto';
+import {
+  PaginatedViewDto,
+  sortDirectionAdapter,
+} from '../../../../core/dto/base-paginated.view-dto';
 import { BlogViewDto } from '../api/view-dto/blog.view-dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -83,7 +85,7 @@ export class BlogsQueryRepository {
     if (!blog) {
       throw new DomainException({
         code: DomainExceptionCode.NotFound,
-        message: 'blog for create post not found',
+        message: 'blog does not exists',
       });
     }
 

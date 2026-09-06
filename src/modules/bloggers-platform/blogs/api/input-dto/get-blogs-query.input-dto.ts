@@ -15,8 +15,3 @@ export const sortByBlogsQueryAdapter = {
   createdAt: 'created_at',
   name: 'name',
 };
-
-export const sortDirectionAdapter: Record<'asc' | 'desc', 'ASC' | 'DESC'> = {
-  asc: 'ASC',
-  desc: 'DESC',
-};
