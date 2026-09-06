@@ -33,11 +33,11 @@ export class UpdatePostLikeUseCase implements ICommandHandler<UpdatePostLikeComm
 
     /** если есть дельта  лайков - обновляем счетчик в посте */
     if (likesCountData && Object.keys(likesCountData).length > 0) {
-      await this.postsRepository.updateLikeCount(
+      const updatedPost = post.updateLikeCount(
         likesCountData.likesCount ?? 0,
         likesCountData.dislikesCount ?? 0,
-        post.id,
       );
+      await this.postsRepository.save(updatedPost);
     }
   }
 }

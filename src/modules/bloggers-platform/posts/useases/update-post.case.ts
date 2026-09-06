@@ -14,19 +14,18 @@ export class UpdatePostUseCase implements ICommandHandler<UpdatePostCommand> {
     private blogRepository: BlogsRepository,
   ) {}
 
-  async execute({ dto }: UpdatePostCommand): Promise<void> {
+  async execute({ dto }: UpdatePostCommand): Promise<string> {
     const { title, content, shortDescription, postId, blogId } = dto;
 
     await this.blogRepository.findByIdOrFail(blogId);
     const post = await this.postsRepository.findByIdOrFail(postId);
 
-    return this.postsRepository.updatePost(
-      {
-        title,
-        content,
-        short_description: shortDescription,
-      },
-      post.id,
-    );
+    const updatedPost = post.updatePost({
+      title,
+      content,
+      short_description: shortDescription,
+    });
+
+    return await this.postsRepository.save(updatedPost);
   }
 }

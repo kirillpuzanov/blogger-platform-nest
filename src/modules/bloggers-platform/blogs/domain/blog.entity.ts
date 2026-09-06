@@ -3,8 +3,10 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { PostTypeOrm } from '../../posts/domain/post.entity';
 
 export const blogNameConstraints = {
   minLength: 1,
@@ -50,6 +52,12 @@ export class BlogTypeOrm implements BlogSqlDto {
 
   @Column({ type: 'boolean', nullable: false, default: false })
   is_membership: boolean;
+
+  @OneToMany(() => PostTypeOrm, (post) => post.blog, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  posts: PostTypeOrm[];
 
   static createBlog(dto: CreateBlogDto): BlogTypeOrm {
     const blog = new this();
