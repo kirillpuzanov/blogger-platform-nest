@@ -42,7 +42,9 @@ export class BlogsQueryRepository {
     ]);
 
     if (searchNameTerm) {
-      qb.where('name ILILE :searchNameTerm', { searchNameTerm });
+      qb.where('name ILIKE :searchNameTerm', {
+        searchNameTerm: `%${searchNameTerm}%`,
+      });
     }
 
     const sortByExpression =
