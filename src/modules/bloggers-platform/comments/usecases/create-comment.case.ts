@@ -6,8 +6,8 @@ import {
   DomainException,
   DomainExceptionCode,
 } from '../../../../core/exceptions/domain.exception';
-import { CommentSql } from '../domain/comment.entity';
 import { UsersExternalRepository } from '../../../user-accounts/users/infra/users-external.repository';
+import { CommentTypeOrm } from '../domain/comment.entity';
 
 export class CreateCommentCommand {
   constructor(public dto: CreateCommentDto) {}
@@ -34,7 +34,7 @@ export class CreateCommentUseCase implements ICommandHandler<CreateCommentComman
       });
     }
 
-    const newComment = CommentSql.createComment({
+    const newComment = CommentTypeOrm.createComment({
       blogId: post.blog_id,
       content,
       postId,
@@ -42,8 +42,7 @@ export class CreateCommentUseCase implements ICommandHandler<CreateCommentComman
       userId: user.id,
     });
 
-    const newCommentsId =
-      await this.commentsRepository.createComment(newComment);
+    const newCommentsId = await this.commentsRepository.save(newComment);
 
     return newCommentsId;
   }

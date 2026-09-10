@@ -6,10 +6,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { BlogTypeOrm } from '../../blogs/domain/blog.entity';
 import { UpdatePostSqlDomainDto } from './dto/update-post.domain-dto';
+import { CommentTypeOrm } from '../../comments/domain/comment.entity';
 
 export const postTitleConstraints = {
   minLength: 1,
@@ -57,6 +59,12 @@ export class PostTypeOrm implements PostSqlDto {
 
   @Column({ type: 'integer', nullable: false, default: 0 })
   dislikes_count: number;
+
+  @OneToMany(() => CommentTypeOrm, (comment) => comment.blog, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  comments: CommentTypeOrm[];
 
   static createPost(dto: CreatePostSqlDomainDto): PostTypeOrm {
     const post = new this();

@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { PostTypeOrm } from '../../posts/domain/post.entity';
+import { CommentTypeOrm } from '../../comments/domain/comment.entity';
 
 export const blogNameConstraints = {
   minLength: 1,
@@ -58,6 +59,12 @@ export class BlogTypeOrm implements BlogSqlDto {
     onDelete: 'CASCADE',
   })
   posts: PostTypeOrm[];
+
+  @OneToMany(() => CommentTypeOrm, (comment) => comment.blog, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  comments: CommentTypeOrm[];
 
   static createBlog(dto: CreateBlogDto): BlogTypeOrm {
     const blog = new this();

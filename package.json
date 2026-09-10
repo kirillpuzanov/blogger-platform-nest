@@ -23,7 +23,11 @@
     "db:start": "brew services start postgresql",
     "db:stop": "brew services stop postgresql",
     "db:restart": "brew services restart postgresql",
-    "db:status": "brew services list | grep postgres"
+    "db:status": "brew services list | grep postgres",
+    "add-empty-migration": "typeorm-ts-node-commonjs migration:create",
+    "create-migration": "typeorm-ts-node-commonjs migration:generate -d typeorm.config.ts",
+    "apply-migration": "typeorm-ts-node-commonjs migration:run -d typeorm.config.ts",
+    "revert-migration": "typeorm-ts-node-commonjs migration:revert -d typeorm.config.ts"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.3.6",

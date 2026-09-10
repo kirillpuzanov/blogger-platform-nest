@@ -22,7 +22,6 @@ export class DeleteBlogUseCase implements ICommandHandler<DeleteBlogCommand> {
 
     /** должны удалиться каскадом за счет связи + onDelete: CASCADE */
     // await this.postsRepository.deleteMany(id);
-
-    await this.commentsRepository.deleteMany(id);
+    // await this.commentsRepository.deleteMany(id);
   }
 }

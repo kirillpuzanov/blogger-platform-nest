@@ -35,7 +35,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         username: coreConfig.sqlUserName,
         database: coreConfig.sqlDbName,
         autoLoadEntities: true,
-        synchronize: true,
+        // synchronize: true,
         logging: true,
       }),
     }),

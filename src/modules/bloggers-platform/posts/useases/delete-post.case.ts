@@ -23,6 +23,8 @@ export class DeletePostUseCase implements ICommandHandler<DeletePostCommand> {
     await this.postsRepository.findByIdOrFail(postId);
 
     await this.postsRepository.deleteById(postId);
-    await this.commentsRepository.deleteMany(postId);
+
+    /** должны удалить за счет связи и каскадности */
+    // await this.commentsRepository.deleteMany(postId);
   }
 }
