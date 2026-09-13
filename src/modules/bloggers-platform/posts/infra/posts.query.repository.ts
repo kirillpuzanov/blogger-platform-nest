@@ -99,13 +99,14 @@ export class PostsQueryRepository {
     // проверка внутри
     await this.blogsQueryRepository.getByIdOrFail(blogId);
 
-    const qb = this.postsRepo.createQueryBuilder('posts');
+    const qb = this.postsRepo.createQueryBuilder('post');
 
     const sortByExpression =
       sortByPostsQueryAdapter[sortBy] === 'created_at'
         ? sortByPostsQueryAdapter[sortBy]
         : `${sortByPostsQueryAdapter[sortBy]} COLLATE "C"`;
 
+    qb.where('post.blog_id = :blogId', { blogId });
     qb.orderBy(sortByExpression, sortDirectionAdapter[sortDirection]);
 
     /** пагинация */

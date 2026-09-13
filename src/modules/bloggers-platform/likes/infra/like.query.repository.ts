@@ -21,7 +21,7 @@ export class LikeQueryRepository {
     if (userId && entityIds.length > 0) {
       const userLikes = await this.likeRepo
         .createQueryBuilder('l')
-        .select(['l.parent_id', 'l.status'])
+        .select(['l.parent_id as parent_id', 'l.status as status'])
         .where('l.user_id = :userId', { userId })
         .andWhere('l.parent_id = ANY(:entityIds)', { entityIds })
         .getRawMany<LikeSqlDto>();
@@ -45,7 +45,7 @@ export class LikeQueryRepository {
       return [];
     }
 
-    const result = this.dataSource
+    const result = await this.dataSource
       .createQueryBuilder()
       .select([
         'ranked.parent_id',

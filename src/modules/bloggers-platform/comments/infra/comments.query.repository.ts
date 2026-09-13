@@ -63,7 +63,7 @@ export class CommentsQueryRepository {
       });
     }
 
-    const qb = this.commentsRepo.createQueryBuilder('comments');
+    const qb = this.commentsRepo.createQueryBuilder('comment');
 
     const sortByExpression =
       sortByCommentsQueryAdapter[sortBy] === 'created_at'
