@@ -3,7 +3,7 @@ import { LikeRepository } from './infra/like.repository';
 import { LikeStatus } from '../../../core/dto/like-status';
 import { LikeCountUpdateDto } from './dto/like-count-update.dto';
 import { UsersExternalRepository } from '../../user-accounts/users/infra/users-external.repository';
-import { LikeSql } from './domain/like.entity';
+import { LikeTypeOrm } from './domain/like.entity';
 
 @Injectable()
 export class LikeService {
@@ -19,7 +19,10 @@ export class LikeService {
   ): Promise<LikeCountUpdateDto> {
     let likesCountDelta: LikeCountUpdateDto = {};
 
-    const existingLike = await this.likeRepository.getLike(parentId, userId);
+    const existingLike = await this.likeRepository.getLikeOrFail(
+      parentId,
+      userId,
+    );
     /** доп проверка, если статус не изменился ничего не делаем */
     if (existingLike?.status === newLikeStatus) {
       return likesCountDelta;
@@ -27,25 +30,23 @@ export class LikeService {
 
     /** считаем дельты для изменения счетчиков в parent-сущности */
     likesCountDelta = this.calculateCountersDelta(
-      existingLike?.status,
+      existingLike?.status ?? LikeStatus.None,
       newLikeStatus,
     );
 
     /** если лайка нет - создадим */
     if (!existingLike) {
       const user = await this.usersExternalRepository.getById(userId);
-      const newLike = LikeSql.createLike({
+      const newLike = LikeTypeOrm.createLike({
         parentId,
         userId,
         userLogin: user?.login ?? 'unknown',
         status: newLikeStatus,
       });
-      await this.likeRepository.createLike(newLike);
+      await this.likeRepository.save(newLike);
     } else {
-      await this.likeRepository.updateLikeStatus(
-        newLikeStatus,
-        existingLike.id,
-      );
+      existingLike.updateLikeStatus(newLikeStatus);
+      await this.likeRepository.save(existingLike);
     }
 
     return likesCountDelta;

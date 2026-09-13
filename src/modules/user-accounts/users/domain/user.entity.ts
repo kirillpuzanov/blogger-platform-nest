@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { CreateUserDomainDto } from './dto/create-user.domain.dto';
 import { SessionTypeOrm } from './session.entity';
+import { LikeTypeOrm } from '../../../bloggers-platform/likes/domain/like.entity';
 
 export const loginConstraints = {
   minLength: 3,
@@ -65,6 +66,10 @@ export class UserTypeOrm {
   /** у одного пользователя несколько сессий - OneToMany */
   @OneToMany(() => SessionTypeOrm, (session) => session.user)
   sessions: SessionTypeOrm[];
+
+  /** пользовательские лайки, к разным сущностям (и посты и комменты) */
+  @OneToMany(() => LikeTypeOrm, (like) => like.user)
+  likes: LikeTypeOrm[];
 
   static createUser(
     dto: CreateUserDomainDto,
